@@ -1,3 +1,17 @@
+/**
+ * @file ANN.h
+ * @brief Approximate Nearest Neighbor searching library
+ * @author Sunil Arya, David Mount
+ * @version 1.1.2
+ * 
+ * ANN is a library for approximate nearest neighbor searching,
+ * based on the use of standard and priority search in kd-trees
+ * and balanced box-decomposition (bbd) trees.
+ * 
+ * @sa https://www.cs.umd.edu/~mount/ANN/ for original library
+ * @copyright GNU Lesser General Public License
+ */
+
 //----------------------------------------------------------------------
 // File:			ANN.h
 // Programmer:		Sunil Arya and David Mount
@@ -31,6 +45,18 @@
 //	Revision 1.1.2  01/27/10
 //		Fixed minor compilation bugs for new versions of gcc
 //----------------------------------------------------------------------
+
+/**
+ * @defgroup ANN ANN Library
+ * @brief Approximate Nearest Neighbor searching library
+ * 
+ * ANN is a library for approximate nearest neighbor searching,
+ * based on the use of standard and priority search in kd-trees
+ * and balanced box-decomposition (bbd) trees.
+ * 
+ * @sa https://www.cs.umd.edu/~mount/ANN/ for original library
+ * @copyright GNU Lesser General Public License
+ */
 
 //----------------------------------------------------------------------
 // ANN - approximate nearest neighbor searching
@@ -156,8 +182,19 @@ constexpr ANNbool ANNfalse = false;
 //		not occur in distance calculation.
 //----------------------------------------------------------------------
 
-typedef double	ANNcoord;				// coordinate data type
-typedef double	ANNdist;				// distance data type
+/**
+
+ * @brief Coordinate data type
+ * @ingroup ANN
+ */
+typedef double	ANNcoord;
+
+/**
+
+ * @brief Distance data type
+ * @ingroup ANN
+ */
+typedef double	ANNdist;
 
 //----------------------------------------------------------------------
 //	ANNidx
@@ -173,8 +210,10 @@ typedef double	ANNdist;				// distance data type
 //		It should be distinguishable from any valid array index.
 //----------------------------------------------------------------------
 
-typedef int		ANNidx;					// point index
-const ANNidx	ANN_NULL_IDX = -1;		// a NULL point index
+/** @brief Point index type */
+typedef int		ANNidx;
+/** @brief NULL index for invalid result */
+const ANNidx	ANN_NULL_IDX = -1;
 
 //----------------------------------------------------------------------
 //	Infinite distance:
@@ -489,9 +528,19 @@ DLL_API void annDeallocPts(
 //		by itself.
 //----------------------------------------------------------------------
 
+/**
+
+ * @brief Abstract base class for point sets
+ * 
+ * This is the abstract object from which all the search structures
+ * are derived. It provides the interface for k-nearest neighbor
+ * and fixed-radius searches.
+ * 
+ * @ingroup ANN
+ */
 class DLL_API ANNpointSet {
 public:
-	virtual ~ANNpointSet() {}			// virtual distructor
+	virtual ~ANNpointSet() {}			// virtual destructor
 
 	virtual void annkSearch(			// approx k near neighbor search
 		ANNpoint		q,				// query point
@@ -703,6 +752,16 @@ class ANNkdStats;				// stats on kd-tree
 class ANNkd_node;				// generic node in a kd-tree
 typedef ANNkd_node*	ANNkd_ptr;	// pointer to a kd-tree node
 
+/**
+
+ * @brief Kd-tree search structure
+ * 
+ * A kd-tree is a binary tree that partitions space by alternating
+ * splitting hyperplanes orthogonal to the coordinate axes.
+ * This is the main search structure supported by ANN.
+ * 
+ * @ingroup ANN
+ */
 class DLL_API ANNkd_tree: public ANNpointSet {
 protected:
 	int				dim;				// dimension of space
@@ -795,6 +854,15 @@ public:
 //		densely clustered that this is really needed.
 //----------------------------------------------------------------------
 
+/**
+
+ * @brief Box decomposition tree
+ * 
+ * A bd-tree extends the kd-tree with shrinking nodes that allow
+ * for balanced decomposition with bounded aspect ratio cells.
+ * 
+ * @ingroup ANN
+ */
 class DLL_API ANNbd_tree: public ANNkd_tree {
 public:
 	ANNbd_tree(							// build skeleton tree

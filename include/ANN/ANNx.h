@@ -33,6 +33,12 @@
 //		Fixed minor compilation bugs for new versions of gcc
 //----------------------------------------------------------------------
 
+/**
+ * @file ANNx.h
+ * @brief Internal data structures for ANN
+ * @internal
+ */
+
 #ifndef ANNx_H
 #define ANNx_H
 
