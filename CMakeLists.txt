@@ -10,6 +10,14 @@ else()
     add_compile_options(-Wall -Wextra)
 endif()
 
+# OpenMP support for parallel tree construction
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
+else()
+    message(STATUS "OpenMP not found - tree construction will be single-threaded")
+endif()
+
 # Include directories
 include_directories(include)
 include_directories(src)
@@ -17,6 +25,9 @@ include_directories(src)
 # ANN Library
 file(GLOB ANN_SOURCES "src/*.cpp")
 add_library(ANN STATIC ${ANN_SOURCES})
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(ANN PUBLIC OpenMP::OpenMP_CXX)
+endif()
 
 # Testing
 include(FetchContent)

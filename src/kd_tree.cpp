@@ -33,6 +33,10 @@
 #include "kd_util.h"					// kd-tree utilities
 #include <ANN/ANNperf.h>				// performance evaluation
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 //----------------------------------------------------------------------
 //	Global data
 //
@@ -311,6 +315,10 @@ ANNkd_tree::ANNkd_tree(					// basic constructor
 //		points on the low side of the cut.
 //----------------------------------------------------------------------
 
+namespace {
+bool rkd_tree_parallel_enabled = true;
+}
+
 ANNkd_ptr rkd_tree(				// recursive construction of kd-tree
 	ANNpointArray		pa,				// point array
 	ANNidxArray			pidx,			// point indices to store in subtree
@@ -338,17 +346,41 @@ ANNkd_ptr rkd_tree(				// recursive construction of kd-tree
 		ANNcoord lv = bnd_box.lo[cd];	// save bounds for cutting dimension
 		ANNcoord hv = bnd_box.hi[cd];
 
-		bnd_box.hi[cd] = cv;			// modify bounds for left subtree
-		lo = rkd_tree(					// build left subtree
-				pa, pidx, n_lo,			// ...from pidx[0..n_lo-1]
-				dim, bsp, bnd_box, splitter);
-		bnd_box.hi[cd] = hv;			// restore bounds
+		bool use_parallel = rkd_tree_parallel_enabled && n > 1000;
 
-		bnd_box.lo[cd] = cv;			// modify bounds for right subtree
-		hi = rkd_tree(					// build right subtree
-				pa, pidx + n_lo, n-n_lo,// ...from pidx[n_lo..n-1]
-				dim, bsp, bnd_box, splitter);
-		bnd_box.lo[cd] = lv;			// restore bounds
+#ifdef _OPENMP
+		if (use_parallel) {
+			#pragma omp task shared(lo)
+			{
+				ANNorthRect bnd_box_copy = bnd_box;
+				bnd_box_copy.hi[cd] = cv;
+				lo = rkd_tree(pa, pidx, n_lo, dim, bsp, bnd_box_copy, splitter);
+			}
+			#pragma omp task shared(hi)
+			{
+				ANNorthRect bnd_box_copy = bnd_box;
+				bnd_box_copy.lo[cd] = cv;
+				hi = rkd_tree(pa, pidx + n_lo, n - n_lo, dim, bsp, bnd_box_copy, splitter);
+			}
+			#pragma omp taskwait
+		} else {
+			bnd_box.hi[cd] = cv;
+			lo = rkd_tree(pa, pidx, n_lo, dim, bsp, bnd_box, splitter);
+			bnd_box.hi[cd] = hv;
+
+			bnd_box.lo[cd] = cv;
+			hi = rkd_tree(pa, pidx + n_lo, n - n_lo, dim, bsp, bnd_box, splitter);
+			bnd_box.lo[cd] = lv;
+		}
+#else
+		bnd_box.hi[cd] = cv;
+		lo = rkd_tree(pa, pidx, n_lo, dim, bsp, bnd_box, splitter);
+		bnd_box.hi[cd] = hv;
+
+		bnd_box.lo[cd] = cv;
+		hi = rkd_tree(pa, pidx + n_lo, n - n_lo, dim, bsp, bnd_box, splitter);
+		bnd_box.lo[cd] = lv;
+#endif
 
 										// create the splitting node
 		ANNkd_split *ptr = new ANNkd_split(cd, cv, lv, hv, lo, hi);
@@ -382,6 +414,20 @@ ANNkd_tree::ANNkd_tree(					// construct from point array
 	bnd_box_lo = annCopyPt(dd, bnd_box.lo);
 	bnd_box_hi = annCopyPt(dd, bnd_box.hi);
 
+#ifdef _OPENMP
+	int prev_nested = 0;
+	if (n > 1000) {
+		#pragma omp parallel
+		{
+			#pragma omp single
+			{
+				prev_nested = omp_get_nested();
+				omp_set_nested(0);
+			}
+		}
+	}
+#endif
+
 	switch (split) {					// build by rule
 	case ANN_KD_STD:					// standard kd-splitting rule
 		root = rkd_tree(pa, pidx, n, dd, bs, bnd_box, kd_split);
@@ -402,4 +448,7 @@ ANNkd_tree::ANNkd_tree(					// construct from point array
 	default:
 		annError("Illegal splitting method", ANNabort);
 	}
+#ifdef _OPENMP
+	if (n > 1000) omp_set_nested(prev_nested);
+#endif
 }
