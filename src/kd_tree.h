@@ -29,8 +29,6 @@
 
 #include <ANN/ANNx.h>					// all ANN includes
 
-using namespace std;					// make std:: available
-
 //----------------------------------------------------------------------
 //	Generic kd-tree node
 //
@@ -56,8 +54,8 @@ public:
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box) = 0;		// bounding box
 												// print node
-	virtual void print(int level, ostream &out) = 0;
-	virtual void dump(ostream &out) = 0;		// dump node
+	virtual void print(int level, std::ostream &out) = 0;
+	virtual void dump(std::ostream &out) = 0;		// dump node
 
 	friend class ANNkd_tree;					// allow kd-tree to access us
 };
@@ -107,12 +105,12 @@ public:
 				int dim,						// dimension of space
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box);			// bounding box
-	virtual void print(int level, ostream &out);// print node
-	virtual void dump(ostream &out);			// dump node
+virtual void print(int level, std::ostream &out);// print node
+ virtual void dump(std::ostream &out);			// dump node
 
-	virtual void ann_search(ANNdist);			// standard search
-	virtual void ann_pri_search(ANNdist);		// priority search
-	virtual void ann_FR_search(ANNdist);		// fixed-radius search
+ virtual void ann_search(ANNdist);			// standard search
+ virtual void ann_pri_search(ANNdist);		// priority search
+ virtual void ann_FR_search(ANNdist);		// fixed-radius search
 };
 
 //----------------------------------------------------------------------
@@ -169,14 +167,14 @@ public:
 				delete child[ANN_HI];
 		}
 
-	virtual void getStats(						// get tree statistics
-				int dim,						// dimension of space
-				ANNkdStats &st,					// statistics
-				ANNorthRect &bnd_box);			// bounding box
-	virtual void print(int level, ostream &out);// print node
-	virtual void dump(ostream &out);			// dump node
+virtual void getStats(						// get tree statistics
+ 				int dim,						// dimension of space
+ 				ANNkdStats &st,					// statistics
+ 				ANNorthRect &bnd_box);			// bounding box
+ 	virtual void print(int level, std::ostream &out);// print node
+ 	virtual void dump(std::ostream &out);			// dump node
 
-	virtual void ann_search(ANNdist);			// standard search
+ 	virtual void ann_search(ANNdist);			// standard search
 	virtual void ann_pri_search(ANNdist);		// priority search
 	virtual void ann_FR_search(ANNdist);		// fixed-radius search
 };

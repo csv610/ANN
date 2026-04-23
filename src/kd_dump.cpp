@@ -101,7 +101,7 @@ static ANNkd_ptr annReadTree(			// read tree-part of dump file
 
 void ANNkd_tree::Dump(					// dump entire tree
 		ANNbool with_pts,				// print points as well?
-		ostream &out)					// output stream
+		std::ostream &out)					// output stream
 {
 	out << "#ANN " << ANNversion << "\n";
 	out.precision(ANNcoordPrec);		// use full precision in dumping
@@ -132,7 +132,7 @@ void ANNkd_tree::Dump(					// dump entire tree
 }
 
 void ANNkd_split::dump(					// dump a splitting node
-		ostream &out)					// output stream
+		std::ostream &out)					// output stream
 {
 	out << "split " << cut_dim << " " << cut_val << " ";
 	out << cd_bnds[ANN_LO] << " " << cd_bnds[ANN_HI] << "\n";
@@ -142,7 +142,7 @@ void ANNkd_split::dump(					// dump a splitting node
 }
 
 void ANNkd_leaf::dump(					// dump a leaf node
-		ostream &out)					// output stream
+		std::ostream &out)					// output stream
 {
 	if (this == KD_TRIVIAL) {			// canonical trivial leaf node
 		out << "leaf 0\n";				// leaf no points
@@ -157,7 +157,7 @@ void ANNkd_leaf::dump(					// dump a leaf node
 }
 
 void ANNbd_shrink::dump(				// dump a shrinking node
-		ostream &out)					// output stream
+		std::ostream &out)					// output stream
 {
 	out << "shrink " << n_bnds << "\n";
 	for (int j = 0; j < n_bnds; j++) {

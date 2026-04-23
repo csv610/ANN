@@ -29,6 +29,7 @@
 #include "bd_tree.h"					// bd-tree declarations
 #include "kd_util.h"					// kd-tree utilities
 #include "kd_split.h"					// kd-tree splitting rules
+#include <iostream>					// I/O streams
 
 #include <ANN/ANNperf.h>				// performance evaluation
 
@@ -40,7 +41,7 @@
 
 void ANNbd_shrink::print(				// print shrinking node
 		int level,						// depth of node in tree
-		ostream &out)					// output stream
+		std::ostream &out)					// output stream
 {
 	child[ANN_OUT]->print(level+1, out);		// print out-child
 
