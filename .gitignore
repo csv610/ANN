@@ -1,0 +1,12 @@
+build/
+.DS_Store
+*.o
+*.a
+bin/
+lib/
+_deps/
+ann_benchmarks
+ann_sample
+ann_test
+ann2fig
+unit_tests
