@@ -18,16 +18,21 @@ The original version of ANN was released under the GNU Lesser General Public Lic
 
 ## 🛠 Modernization & Contributions
 
-This fork updates the classic ANN library (version 1.1.2) to meet modern software engineering standards. Key improvements include:
+This fork updates the classic ANN library (version 1.1.2) to meet modern software engineering standards.
 
-*   **Build System**: Replaced legacy Makefiles and `Make-config` with a robust, cross-platform **CMake** build system.
-*   **C++ Standards**: Upgraded the codebase to **C++20**.
-    *   Removed deprecated `register` storage class specifiers.
-    *   Resolved `char*` stream extraction vulnerabilities in compliance with C++20 standards.
-    *   Fixed implicit return type issues and modernized function signatures.
-*   **Testing Infrastructure**: Integrated **Google Test (GTest)** for automated unit testing.
-*   **Performance Profiling**: Integrated **Google Benchmark** to provide empirical performance data for kd-tree and bd-tree structures.
-*   **Code Quality**: Cleaned up legacy artifacts (redundant `MS_Win32` directories) and resolved long-standing compiler warnings.
+### Build System
+* Replaced legacy Makefiles and `Make-config` with a robust, cross-platform **CMake** build system.
+* Integrated **Google Test (GTest)** for automated unit testing.
+* Integrated **Google Benchmark** for performance profiling.
+
+### C++20 Modernization
+* **Type Safety**: Replaced legacy `ANNbool` enum with `bool`, added `[[nodiscard]]` attributes to API functions.
+* **Exception Safety**: Added `noexcept` specifiers to const methods and trivial operations.
+* **Const Correctness**: Added `const` to all non-mutating accessor methods.
+* **Modern Types**: Replaced C-style `#define` constants with `constexpr` and `std::string_view`.
+* **Distance Functions**: Replaced macros (`ANN_POW`, `ANN_ROOT`, etc.) with `[[nodiscard]] constexpr inline` functions for zero-overhead abstraction.
+* **Header Hygiene**: Removed `using namespace std;` from headers, use explicit `std::` prefix.
+* **Legacy Fixes**: Removed deprecated `register` storage class, resolved stream extraction vulnerabilities, fixed implicit return types.
 
 ---
 
