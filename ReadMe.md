@@ -24,6 +24,7 @@ This fork updates the classic ANN library (version 1.1.2) to meet modern softwar
 * Replaced legacy Makefiles and `Make-config` with a robust, cross-platform **CMake** build system.
 * Integrated **Google Test (GTest)** for automated unit testing.
 * Integrated **Google Benchmark** for performance profiling.
+* Added **OpenMP** for parallel kd-tree construction on large datasets.
 
 ### C++20 Modernization
 * **Type Safety**: Replaced legacy `ANNbool` enum with `bool`, added `[[nodiscard]]` attributes to API functions.
