@@ -31,6 +31,35 @@ This fork updates the classic ANN library (version 1.1.2) to meet modern softwar
 
 ---
 
+## 🧠 The Landscape of Nearest Neighbor Search
+
+### 1. Modern Nearest Neighbor Algorithms
+Since the original release of ANN, the field has evolved significantly, especially for high-dimensional data (e.g., AI embeddings):
+
+*   **HNSW (Hierarchical Navigable Small World)**: A graph-based approach that is currently the industry standard for high-speed, in-memory approximate search.
+*   **IVF (Inverted File Index)**: Divides the vector space into Voronoi cells to narrow the search scope.
+*   **Product Quantization (PQ)**: Compresses vectors to allow searching billions of points with minimal memory.
+*   **DiskANN**: Optimized for datasets that are too large for RAM, utilizing SSD-resident indices.
+*   **ScaNN**: Developed by Google, it uses anisotropic quantization to achieve state-of-the-art throughput.
+
+### 2. Should we still use ANN?
+**Yes, but it depends on your data.**
+
+The ANN library implements **kd-trees** and **bd-trees**, which are "space-partitioning" structures.
+*   **Use ANN if**: You are working with **low-dimensional data** (e.g., 2D/3D points in GIS, robotics, physics simulations, or CAD). In these domains, tree-based methods are often faster and more memory-efficient than modern graph-based methods.
+*   **Avoid ANN if**: You are working with **high-dimensional embeddings** (e.g., 128D to 1536D vectors from LLMs or image models). In high dimensions, tree-based methods suffer from the "curse of dimensionality" and degrade to linear search ($O(n)$). For these cases, use libraries like [FAISS](https://github.com/facebookresearch/faiss) or [USearch](https://github.com/unum-cloud/usearch).
+
+### 3. Pros and Cons of ANN
+
+| **Pros** | **Cons** |
+| :--- | :--- |
+| **Deterministic**: Offers exact nearest neighbor search (if `eps=0`). | **Dimension Limit**: Performance collapses above ~20 dimensions. |
+| **Low Memory**: No heavy graph edges or quantization tables to store. | **Static Data**: Better for static sets; expensive to re-balance after many inserts. |
+| **Simplicity**: No complex hyperparameters like `M` or `efConstruction`. | **Single Core**: Not natively optimized for massive GPU/SIMD acceleration. |
+| **Precision**: Excellent for geometric algorithms requiring high accuracy. | **Age**: Original codebase is legacy (hence the need for this modernized port). |
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites

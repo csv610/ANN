@@ -110,10 +110,10 @@ public:
 	ANNpoint		h)			// hight point
 	{  lo = annCopyPt(dd, l);  hi = annCopyPt(dd, h);  }
 
-	~ANNorthRect()				// destructor
+	~ANNorthRect() noexcept				// destructor
     {  annDeallocPt(lo);  annDeallocPt(hi);  }
 
-	ANNbool inside(int dim, ANNpoint p);// is point p inside rectangle?
+	[[nodiscard]] ANNbool inside(int dim, ANNpoint p) const noexcept;	// is point p inside rectangle?
 };
 
 void annAssignRect(				// assign one rect to another
@@ -144,22 +144,22 @@ public:
 	int				sdd)		// side
 	{  cd = cdd;  cv = cvv;  sd = sdd;  }
 
-	ANNbool in(ANNpoint q) const	// is q inside halfspace?
-	{  return  (ANNbool) ((q[cd] - cv)*sd >= 0);  }
+	ANNbool in(ANNpoint q) const noexcept	// is q inside halfspace?
+	{  return  (q[cd] - cv)*sd >= 0;  }
 
-	ANNbool out(ANNpoint q) const	// is q outside halfspace?
-	{  return  (ANNbool) ((q[cd] - cv)*sd < 0);  }
+	ANNbool out(ANNpoint q) const noexcept	// is q outside halfspace?
+	{  return  (q[cd] - cv)*sd < 0;  }
 
-	ANNdist dist(ANNpoint q) const	// (squared) distance from q
-	{  return  (ANNdist) ANN_POW(q[cd] - cv);  }
+	[[nodiscard]] ANNdist dist(ANNpoint q) const noexcept	// (squared) distance from q
+	{  return  ANN_POW(q[cd] - cv);  }
 
-	void setLowerBound(int d, ANNpoint p)// set to lower bound at p[i]
+	void setLowerBound(int d, ANNpoint p) noexcept	// set to lower bound at p[i]
 	{  cd = d;  cv = p[d];  sd = +1;  }
 
-	void setUpperBound(int d, ANNpoint p)// set to upper bound at p[i]
+	void setUpperBound(int d, ANNpoint p) noexcept	// set to upper bound at p[i]
 	{  cd = d;  cv = p[d];  sd = -1;  }
 
-	void project(ANNpoint &q)		// project q (modified) onto halfspace
+	void project(ANNpoint &q) noexcept		// project q (modified) onto halfspace
 	{  if (out(q)) q[cd] = cv;  }
 };
 

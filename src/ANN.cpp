@@ -154,7 +154,7 @@ void annAssignRect(int dim, ANNorthRect &dest, const ANNorthRect &source)
 }
 
 												// is point inside rectangle?
-ANNbool ANNorthRect::inside(int dim, ANNpoint p)
+[[nodiscard]] ANNbool ANNorthRect::inside(int dim, ANNpoint p) const noexcept
 {
 	for (int i = 0; i < dim; i++) {
 		if (p[i] < lo[i] || p[i] > hi[i]) return ANNfalse;

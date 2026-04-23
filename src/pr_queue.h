@@ -69,57 +69,57 @@ public:
 			pq = new pq_node[max+1];	// queue is array [1..max] of nodes
 		}
 
-	~ANNpr_queue()						// destructor
+	~ANNpr_queue() noexcept						// destructor
 		{ delete [] pq; }
 
-	ANNbool empty()						// is queue empty?
-		{ if (n==0) return ANNtrue; else return ANNfalse; }
+	[[nodiscard]] ANNbool empty() const noexcept			// is queue empty?
+		{ return n == 0; }
 
-	ANNbool non_empty()					// is queue nonempty?
-		{ if (n==0) return ANNfalse; else return ANNtrue; }
+	[[nodiscard]] ANNbool non_empty() const noexcept		// is queue nonempty?
+		{ return n != 0; }
 
-	void reset()						// make existing queue empty
+	void reset() noexcept							// make existing queue empty
 		{ n = 0; }
 
 	inline void insert(					// insert item (inlined for speed)
 		PQkey kv,						// key value
-		PQinfo inf)						// item info
+		PQinfo inf) noexcept
 		{
-			if (++n > max_size) annError("Priority queue overflow.", ANNabort);
-			int r = n;
-			while (r > 1) {				// sift up new item
-				int p = r/2;
-				ANN_FLOP(1)				// increment floating ops
-				if (pq[p].key <= kv)	// in proper order
-					break;
-				pq[r] = pq[p];			// else swap with parent
-				r = p;
-			}
-			pq[r].key = kv;				// insert new item at final location
-			pq[r].info = inf;
-		}
+ 			if (++n > max_size) annError("Priority queue overflow.", ANNabort);
+ 			int r = n;
+ 			while (r > 1) {				// sift up new item
+ 				int p = r/2;
+ 				ANN_FLOP(1)				// increment floating ops
+ 				if (pq[p].key <= kv)	// in proper order
+ 					break;
+ 				pq[r] = pq[p];			// else swap with parent
+ 				r = p;
+ 			}
+ 			pq[r].key = kv;				// insert new item at final location
+ 			pq[r].info = inf;
+ 		}
 
-	inline void extr_min(				// extract minimum (inlined for speed)
-		PQkey &kv,						// key (returned)
-		PQinfo &inf)					// item info (returned)
-		{
-			kv = pq[1].key;				// key of min item
-			inf = pq[1].info;			// information of min item
-			PQkey kn = pq[n--].key;// last item in queue
-			int p = 1;			// p points to item out of position
-			int r = p<<1;		// left child of p
-			while (r <= n) {			// while r is still within the heap
-				ANN_FLOP(2)				// increment floating ops
-										// set r to smaller child of p
-				if (r < n  && pq[r].key > pq[r+1].key) r++;
-				if (kn <= pq[r].key)	// in proper order
-					break;
-				pq[p] = pq[r];			// else swap with child
-				p = r;					// advance pointers
-				r = p<<1;
-			}
-			pq[p] = pq[n+1];			// insert last item in proper place
-		}
+ 	inline void extr_min(				// extract minimum (inlined for speed)
+ 		PQkey &kv,						// key (returned)
+ 		PQinfo &inf) noexcept
+ 		{
+ 			kv = pq[1].key;				// key of min item
+ 			inf = pq[1].info;			// information of min item
+ 			PQkey kn = pq[n--].key;// last item in queue
+ 			int p = 1;			// p points to item out of position
+ 			int r = p<<1;		// left child of p
+ 			while (r <= n) {			// while r is still within the heap
+ 				ANN_FLOP(2)				// increment floating ops
+ 										// set r to smaller child of p
+ 				if (r < n  && pq[r].key > pq[r+1].key) r++;
+ 				if (kn <= pq[r].key)	// in proper order
+ 					break;
+ 				pq[p] = pq[r];			// else swap with child
+ 				p = r;					// advance pointers
+ 				r = p<<1;
+ 			}
+ 			pq[p] = pq[n+1];			// insert last item in proper place
+ 		}
 };
 
 #endif

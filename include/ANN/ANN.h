@@ -119,17 +119,17 @@
 #endif
 
 #define ANNversion 		"1.1.2"			// ANN version and information
-#define ANNversionCmt	""
-#define ANNcopyright	"David M. Mount and Sunil Arya"
-#define ANNlatestRev	"Jan 27, 2010"
+constexpr inline char ANNversionCmt[]	= "";
+constexpr inline char ANNcopyright[]	= "David M. Mount and Sunil Arya";
+constexpr inline char ANNlatestRev[]	= "Jan 27, 2010";
 
 //----------------------------------------------------------------------
-//	ANNbool
-//	This is a simple boolean type. Although ANSI C++ is supposed
-//	to support the type bool, some compilers do not have it.
+//	ANNbool - Legacy boolean type alias for backward compatibility
 //----------------------------------------------------------------------
 
-enum ANNbool {ANNfalse = 0, ANNtrue = 1}; // ANN boolean type (non ANSI C++)
+typedef bool ANNbool;						// ANN boolean type (now alias for bool)
+constexpr ANNbool ANNtrue = true;
+constexpr ANNbool ANNfalse = false;
 
 //----------------------------------------------------------------------
 //	ANNcoord, ANNdist
@@ -333,10 +333,10 @@ const ANNbool	ANN_ALLOW_SELF_MATCH	= ANNtrue;
 //----------------------------------------------------------------------
 //	Use the following for the Euclidean norm
 //----------------------------------------------------------------------
-#define ANN_POW(v)			((v)*(v))
-#define ANN_ROOT(x)			sqrt(x)
-#define ANN_SUM(x,y)		((x) + (y))
-#define ANN_DIFF(x,y)		((y) - (x))
+[[nodiscard]] constexpr inline ANNdist ANN_POW(ANNcoord v) noexcept { return v * v; }
+[[nodiscard]] constexpr inline double ANN_ROOT(ANNdist x) noexcept { return std::sqrt(x); }
+[[nodiscard]] constexpr inline ANNdist ANN_SUM(ANNdist x, ANNdist y) noexcept { return x + y; }
+[[nodiscard]] constexpr inline ANNdist ANN_DIFF(ANNcoord x, ANNcoord y) noexcept { return y - x; }
 
 //----------------------------------------------------------------------
 //	Use the following for the L_1 (Manhattan) norm
@@ -413,27 +413,27 @@ typedef ANNidx*   ANNidxArray;		// an array of point indices
 //				the new point.  It returns a pointer to the newly
 //				allocated copy.
 //----------------------------------------------------------------------
-   
-DLL_API ANNdist annDist(
+
+[[nodiscard]] DLL_API ANNdist annDist(
 	int				dim,		// dimension of space
 	ANNpoint		p,			// points
 	ANNpoint		q);
 
-DLL_API ANNpoint annAllocPt(
+[[nodiscard]] DLL_API ANNpoint annAllocPt(
 	int				dim,		// dimension
 	ANNcoord		c = 0);		// coordinate value (all equal)
 
-DLL_API ANNpointArray annAllocPts(
+[[nodiscard]] DLL_API ANNpointArray annAllocPts(
 	int				n,			// number of points
 	int				dim);		// dimension
 
 DLL_API void annDeallocPt(
 	ANNpoint		&p);		// deallocate 1 point
-   
+    
 DLL_API void annDeallocPts(
 	ANNpointArray	&pa);		// point array
 
-DLL_API ANNpoint annCopyPt(
+[[nodiscard]] DLL_API ANNpoint annCopyPt(
 	int				dim,		// dimension
 	ANNpoint		source);	// point to copy
 
@@ -509,10 +509,10 @@ public:
 		double			eps=0.0			// error bound
 		) = 0;							// pure virtual (defined elsewhere)
 
-	virtual int theDim() = 0;			// return dimension of space
-	virtual int nPoints() = 0;			// return number of points
-										// return pointer to points
-	virtual ANNpointArray thePoints() = 0;
+	[[nodiscard]] virtual int theDim() const noexcept = 0;			// return dimension of space
+	[[nodiscard]] virtual int nPoints() const noexcept = 0;			// return number of points
+											// return pointer to points
+	[[nodiscard]] virtual ANNpointArray thePoints() const noexcept = 0;
 };
 
 //----------------------------------------------------------------------
@@ -562,13 +562,13 @@ public:
 		ANNdistArray	dd = NULL,		// dist to near neighbors (modified)
 		double			eps=0.0);		// error bound
 
-	int theDim()						// return dimension of space
+	[[nodiscard]] int theDim() const noexcept		// return dimension of space
 		{ return dim; }
 
-	int nPoints()						// return number of points
+	[[nodiscard]] int nPoints() const noexcept		// return number of points
 		{ return n_pts; }
 
-	ANNpointArray thePoints()			// return pointer to points
+	[[nodiscard]] ANNpointArray thePoints() const noexcept	// return pointer to points
 		{  return pts;  }
 };
 
@@ -760,13 +760,13 @@ public:
 		ANNdistArray	dd = NULL,		// dist to near neighbors (modified)
 		double			eps=0.0);		// error bound
 
-	int theDim()						// return dimension of space
+	[[nodiscard]] int theDim() const noexcept		// return dimension of space
 		{ return dim; }
 
-	int nPoints()						// return number of points
+	[[nodiscard]] int nPoints() const noexcept		// return number of points
 		{ return n_pts; }
 
-	ANNpointArray thePoints()			// return pointer to points
+	[[nodiscard]] ANNpointArray thePoints() const noexcept	// return pointer to points
 		{  return pts;  }
 
 	virtual void Print(					// print the tree (for debugging)
