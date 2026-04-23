@@ -55,11 +55,11 @@ target_link_libraries(ann_test ANN)
 add_executable(ann_sample sample/ann_sample.cpp)
 target_link_libraries(ann_sample ANN)
 
-add_executable(ann2fig ann2fig/ann2fig.cpp)
-target_link_libraries(ann2fig ANN)
+# add_executable(ann2fig ann2fig/ann2fig.cpp)
+# target_link_libraries(ann2fig ANN)
 
 # Installation (optional, but good practice)
-install(TARGETS ANN ann_test ann_sample ann2fig
+install(TARGETS ANN ann_test ann_sample
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
