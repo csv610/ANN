@@ -88,11 +88,12 @@
 //----------------------------------------------------------------------
 //  basic includes
 //----------------------------------------------------------------------
-
+ 
 #include <cstdlib>			// standard lib includes
 #include <cmath>			// math includes
 #include <iostream>			// I/O streams
 #include <cstring>			// C-style strings
+#include <string_view>		// string views
 
 //----------------------------------------------------------------------
 // Limits
@@ -119,9 +120,9 @@
 #endif
 
 #define ANNversion 		"1.1.2"			// ANN version and information
-constexpr inline char ANNversionCmt[]	= "";
-constexpr inline char ANNcopyright[]	= "David M. Mount and Sunil Arya";
-constexpr inline char ANNlatestRev[]	= "Jan 27, 2010";
+constexpr inline std::string_view ANNversionCmt{""};
+constexpr inline std::string_view ANNcopyright{"David M. Mount and Sunil Arya"};
+constexpr inline std::string_view ANNlatestRev{"Jan 27, 2010"};
 
 //----------------------------------------------------------------------
 //	ANNbool - Legacy boolean type alias for backward compatibility
