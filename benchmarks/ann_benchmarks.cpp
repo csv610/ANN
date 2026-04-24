@@ -26,7 +26,7 @@ static void BM_KdTreeConstruction(benchmark::State& state) {
     annDeallocPts(data_pts);
     state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_KdTreeConstruction)->RangeMultiplier(10)->Range(100, 100000)->Complexity();
+BENCHMARK(BM_KdTreeConstruction)->RangeMultiplier(10)->Range(1000, 1000000)->Complexity();
 
 static void BM_KdTreeSearch(benchmark::State& state) {
     int dim = 3;
