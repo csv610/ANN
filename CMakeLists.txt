@@ -60,7 +60,7 @@ add_executable(ann_benchmarks benchmarks/ann_benchmarks.cpp)
 target_link_libraries(ann_benchmarks ANN benchmark::benchmark_main)
 
 # Executables (Legacy tests/samples)
-add_executable(ann_test test/ann_test.cpp test/rand.cpp)
+add_executable(ann_test tests/ann_test.cpp tests/rand.cpp)
 target_link_libraries(ann_test ANN)
 
 add_executable(ann_sample sample/ann_sample.cpp)
