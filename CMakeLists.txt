@@ -66,6 +66,9 @@ target_link_libraries(ann_test ANN)
 add_executable(ann_sample sample/ann_sample.cpp)
 target_link_libraries(ann_sample ANN)
 
+add_executable(high_level_sample sample/high_level_sample.cpp)
+target_link_libraries(high_level_sample ANN)
+
 # add_executable(ann2fig ann2fig/ann2fig.cpp)
 # target_link_libraries(ann2fig ANN)
 
