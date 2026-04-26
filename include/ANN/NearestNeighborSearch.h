@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <stdexcept>
+#include <optional>
 #include <ANN/ANN.h>
 
 namespace ANN {
@@ -124,6 +125,21 @@ public:
             }
         }
         return results;
+    }
+
+    /**
+     * @brief Find a point that exactly matches the query.
+     * 
+     * @param query The query point.
+     * @param tolerance The distance tolerance (default 0.0 for bitwise exact).
+     * @return std::optional<int> The index of the matching point, or std::nullopt if not found.
+     */
+    [[nodiscard]] std::optional<int> findExactMatch(const Point& query, double tolerance = 0.0) const {
+        auto results = search(query, 1, 0.0);
+        if (!results.empty() && results[0].distance <= tolerance) {
+            return results[0].index;
+        }
+        return std::nullopt;
     }
 
     /**

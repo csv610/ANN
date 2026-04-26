@@ -90,6 +90,25 @@ TEST_F(ANNTest, HighLevelWrapperEmptyThrows) {
     EXPECT_THROW(ANN::NearestNeighborSearch<2> nns(points), std::invalid_argument);
 }
 
+TEST_F(ANNTest, HighLevelWrapperExactMatch) {
+    std::vector<std::array<double, 2>> points = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}};
+    ANN::NearestNeighborSearch<2> nns(points);
+
+    // Exact match exists
+    auto match = nns.findExactMatch({2.0, 2.0});
+    ASSERT_TRUE(match.has_value());
+    EXPECT_EQ(*match, 1);
+
+    // Exact match does not exist
+    auto no_match = nns.findExactMatch({2.1, 2.1});
+    EXPECT_FALSE(no_match.has_value());
+
+    // Match within tolerance
+    auto tolerance_match = nns.findExactMatch({2.1, 2.1}, 0.2);
+    ASSERT_TRUE(tolerance_match.has_value());
+    EXPECT_EQ(*tolerance_match, 1);
+}
+
 TEST_F(ANNTest, KdTreeBasicSearch) {
     std::unique_ptr<ANNkd_tree> kdTree(new ANNkd_tree(data_pts, max_pts, dim));
 
