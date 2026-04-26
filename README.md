@@ -24,7 +24,7 @@ This fork updates the classic ANN library (version 1.1.2) to meet modern softwar
 * **RAII Management**: Automated memory management for point arrays and search trees—no more manual `annAllocPts` or `delete`.
 * **Type Safety**: Uses `std::array<double, Dim>` for points, making dimensionality errors a compile-time check.
 * **Modern Results**: Returns results in a clean `std::vector<Result>` with Euclidean distances already computed.
-* **Exact Matching**: Dedicated `findExactMatch` method with optional tolerance support.
+* **Exact Matching**: Dedicated `findExactMatches` method that returns all indices within a tolerance.
 
 ### Build System
 
@@ -150,9 +150,10 @@ int main() {
         std::cout << "Index: " << res.index << ", Distance: " << res.distance << "\n";
     }
 
-    // 4. Find exact match
-    if (auto match = nns.findExactMatch({1.0, 1.0, 1.0})) {
-        std::cout << "Exact match found at index: " << *match << "\n";
+    // 4. Find exact matches (returns a vector of indices)
+    auto matches = nns.findExactMatches({1.0, 1.0, 1.0});
+    for (int idx : matches) {
+        std::cout << "Exact match found at index: " << idx << "\n";
     }
 
     return 0;
