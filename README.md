@@ -20,6 +20,11 @@ The original version of ANN was released under the GNU Lesser General Public Lic
 
 This fork updates the classic ANN library (version 1.1.2) to meet modern software engineering standards.
 
+### Memory Safety & Stability (Critical Fixes)
+* **Double-Free Resolved**: Fixed a major crash in parallel tree construction where bounding box copies were shallow-copying raw pointers.
+* **Leak-Free**: Verified with AddressSanitizer (ASan) through millions of allocations—ensuring the wrapper and core library are completely memory-safe.
+* **Hardened Deallocation**: Added defensive null-checks to internal deallocation routines to prevent undefined behavior during cleanup.
+
 ### High-Level C++ Wrapper (New!)
 * **RAII Management**: Automated memory management for point arrays and search trees—no more manual `annAllocPts` or `delete`.
 * **Type Safety**: Uses `std::array<double, Dim>` for points, making dimensionality errors a compile-time check.
@@ -111,6 +116,15 @@ The build will produce the following targets:
 We use Google Test to ensure the integrity of the search algorithms:
 ```bash
 ./unit_tests
+```
+
+### Memory Leak Testing
+A dedicated stress test to verify stability under high frequency allocation/destruction:
+```bash
+# Enable ASan for the most rigorous check
+cmake -DENABLE_ASAN=ON ..
+make leak_test
+./leak_test
 ```
 
 ### Running Benchmarks
