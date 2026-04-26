@@ -39,6 +39,14 @@ int main() {
                       << ", Distance: " << res.distance << "\n";
         }
 
+        // 6. Find exact matches
+        auto matches = nns.findExactMatches(query, 0.1);
+        if (!matches.empty()) {
+            std::cout << "Exact (or near) matches found: ";
+            for (int idx : matches) std::cout << idx << " ";
+            std::cout << "\n";
+        }
+
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

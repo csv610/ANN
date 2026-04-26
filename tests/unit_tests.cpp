@@ -100,7 +100,7 @@ TEST_F(ANNTest, HighLevelWrapperExactMatch) {
     ANN::NearestNeighborSearch<2> nns(points);
 
     // Exact match exists (should find two indices)
-    auto matches = nns.findExactMatch({2.0, 2.0});
+    auto matches = nns.findExactMatches({2.0, 2.0});
     EXPECT_EQ(matches.size(), 2);
     // Sort to ensure order for testing
     std::sort(matches.begin(), matches.end());
@@ -108,11 +108,11 @@ TEST_F(ANNTest, HighLevelWrapperExactMatch) {
     EXPECT_EQ(matches[1], 3);
 
     // Exact match does not exist
-    auto no_matches = nns.findExactMatch({2.1, 2.1});
+    auto no_matches = nns.findExactMatches({2.1, 2.1});
     EXPECT_TRUE(no_matches.empty());
 
     // Match within tolerance
-    auto tolerance_matches = nns.findExactMatch({2.1, 2.1}, 0.2);
+    auto tolerance_matches = nns.findExactMatches({2.1, 2.1}, 0.2);
     EXPECT_EQ(tolerance_matches.size(), 2);
 }
 

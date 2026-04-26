@@ -134,7 +134,7 @@ public:
      * @param tolerance The distance tolerance (default 0.0 for bitwise exact).
      * @return std::vector<int> A vector of indices of the matching points.
      */
-    [[nodiscard]] std::vector<int> findExactMatch(const Point& query, double tolerance = 0.0) const {
+    [[nodiscard]] std::vector<int> findExactMatches(const Point& query, double tolerance = 0.0) const {
         if (!kd_tree) return {};
 
         // ANN uses squared distances for radius search
