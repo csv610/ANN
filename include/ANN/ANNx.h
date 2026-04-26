@@ -96,6 +96,7 @@ void annPrintPt(				// print a point
 
 class ANNorthRect {
 public:
+	int             dim;        // dimension of space
 	ANNpoint		lo;			// rectangle lower bounds
 	ANNpoint		hi;			// rectangle upper bounds
 //
@@ -103,18 +104,28 @@ public:
 	int				dd,			// dimension of space
 	ANNcoord		l=0,		// default is empty
 	ANNcoord		h=0)
-	{  lo = annAllocPt(dd, l);  hi = annAllocPt(dd, h); }
+	{  dim = dd; lo = annAllocPt(dd, l);  hi = annAllocPt(dd, h); }
 
-	ANNorthRect(				// (almost a) copy constructor
-	int				dd,			// dimension
-	const			ANNorthRect &r) // rectangle to copy
-	{  lo = annCopyPt(dd, r.lo);  hi = annCopyPt(dd, r.hi);  }
+	ANNorthRect(const ANNorthRect &r) // proper copy constructor
+	{  dim = r.dim; lo = annCopyPt(dim, r.lo);  hi = annCopyPt(dim, r.hi);  }
+
+    ANNorthRect& operator=(const ANNorthRect &r) // copy assignment
+    {
+        if (this != &r) {
+            annDeallocPt(lo);
+            annDeallocPt(hi);
+            dim = r.dim;
+            lo = annCopyPt(dim, r.lo);
+            hi = annCopyPt(dim, r.hi);
+        }
+        return *this;
+    }
 
 	ANNorthRect(				// construct from points
 	int				dd,			// dimension
 	ANNpoint		l,			// low point
 	ANNpoint		h)			// hight point
-	{  lo = annCopyPt(dd, l);  hi = annCopyPt(dd, h);  }
+	{  dim = dd; lo = annCopyPt(dd, l);  hi = annCopyPt(dd, h);  }
 
 	~ANNorthRect() noexcept				// destructor
     {  annDeallocPt(lo);  annDeallocPt(hi);  }

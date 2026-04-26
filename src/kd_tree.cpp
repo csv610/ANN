@@ -414,20 +414,6 @@ ANNkd_tree::ANNkd_tree(					// construct from point array
 	bnd_box_lo = annCopyPt(dd, bnd_box.lo);
 	bnd_box_hi = annCopyPt(dd, bnd_box.hi);
 
-#ifdef _OPENMP
-	int prev_nested = 0;
-	if (n > 1000) {
-		#pragma omp parallel
-		{
-			#pragma omp single
-			{
-				prev_nested = omp_get_nested();
-				omp_set_nested(0);
-			}
-		}
-	}
-#endif
-
 	switch (split) {					// build by rule
 	case ANN_KD_STD:					// standard kd-splitting rule
 		root = rkd_tree(pa, pidx, n, dd, bs, bnd_box, kd_split);
@@ -448,7 +434,4 @@ ANNkd_tree::ANNkd_tree(					// construct from point array
 	default:
 		annError("Illegal splitting method", ANNabort);
 	}
-#ifdef _OPENMP
-	if (n > 1000) omp_set_nested(prev_nested);
-#endif
 }
