@@ -16,11 +16,18 @@ The original version of ANN was released under the GNU Lesser General Public Lic
 
 ---
 
-## 🛠 Modernization & Contributions
+### Modernization & Contributions
 
 This fork updates the classic ANN library (version 1.1.2) to meet modern software engineering standards.
 
+### High-Level C++ Wrapper (New!)
+* **RAII Management**: Automated memory management for point arrays and search trees—no more manual `annAllocPts` or `delete`.
+* **Type Safety**: Uses `std::array<double, Dim>` for points, making dimensionality errors a compile-time check.
+* **Modern Results**: Returns results in a clean `std::vector<Result>` with Euclidean distances already computed.
+* **Exact Matching**: Dedicated `findExactMatch` method with optional tolerance support.
+
 ### Build System
+
 * Replaced legacy Makefiles and `Make-config` with a robust, cross-platform **CMake** build system.
 * Integrated **Google Test (GTest)** for automated unit testing.
 * Integrated **Google Benchmark** for performance profiling.
@@ -91,9 +98,8 @@ make -j$(nproc)
 
 The build will produce the following targets:
 *   `libANN.a`: The core static library.
-*   `ann_test`: The original evaluation and validation tool.
-*   `ann_sample`: A simple example program.
-*   `ann2fig`: A utility to visualize the search structures.
+*   `high_level_sample`: **(Recommended)** Demonstrates the new modern C++ wrapper.
+*   `ann_sample`: A simple example program using the raw C API.
 *   `unit_tests`: The new GTest-based test suite.
 *   `ann_benchmarks`: The new performance benchmarking tool.
 
@@ -117,7 +123,45 @@ Measure the performance of tree construction and search on your specific hardwar
 
 ## 📖 Usage Example
 
-To use ANN in your own C++ project:
+### Modern C++ Wrapper (Recommended)
+
+The new `NearestNeighborSearch` class hides all the manual pointer management:
+
+```cpp
+#include <ANN/NearestNeighborSearch.h>
+#include <vector>
+#include <array>
+#include <iostream>
+
+int main() {
+    // 1. Prepare points using standard C++ containers
+    std::vector<std::array<double, 3>> data = {
+        {0.0, 0.0, 0.0}, {1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}
+    };
+
+    // 2. Build the index (RAII handles memory)
+    ANN::NearestNeighborSearch<3> nns(data);
+
+    // 3. Search for 2 nearest neighbors
+    std::array<double, 3> query = {1.1, 1.1, 1.1};
+    auto results = nns.search(query, 2);
+
+    for (const auto& res : results) {
+        std::cout << "Index: " << res.index << ", Distance: " << res.distance << "\n";
+    }
+
+    // 4. Find exact match
+    if (auto match = nns.findExactMatch({1.0, 1.0, 1.0})) {
+        std::cout << "Exact match found at index: " << *match << "\n";
+    }
+
+    return 0;
+}
+```
+
+### Raw ANN API (Legacy)
+
+For low-level control, the original C-style API is still available:
 
 ```cpp
 #include <ANN/ANN.h>
