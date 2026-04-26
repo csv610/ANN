@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include <ANN/ANN.h>
+#include <ANN/NearestNeighborSearch.h>
 #include <memory>
+#include <vector>
+#include <array>
 
 class ANNTest : public ::testing::Test {
 protected:
@@ -33,6 +36,59 @@ protected:
     ANNidxArray nn_idx;
     ANNdistArray dists;
 };
+
+TEST_F(ANNTest, HighLevelWrapperBasicSearch) {
+    std::vector<std::array<double, 2>> points;
+    for (int i = 0; i < max_pts; ++i) {
+        points.push_back({static_cast<double>(i), static_cast<double>(i)});
+    }
+
+    ANN::NearestNeighborSearch<2> nns(points);
+    EXPECT_EQ(nns.size(), max_pts);
+
+    std::array<double, 2> query = {5.1, 5.1};
+    auto results = nns.search(query, 1);
+
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0].index, 5);
+    EXPECT_NEAR(results[0].distance, std::sqrt(0.02), 1e-6);
+}
+
+TEST_F(ANNTest, HighLevelWrapperKSearch) {
+    std::vector<std::array<double, 2>> points;
+    for (int i = 0; i < max_pts; ++i) {
+        points.push_back({static_cast<double>(i), static_cast<double>(i)});
+    }
+
+    ANN::NearestNeighborSearch<2> nns(points);
+    
+    std::array<double, 2> query = {5.5, 5.5};
+    auto results = nns.search(query, 5);
+
+    ASSERT_EQ(results.size(), 5);
+    for (size_t i = 1; i < results.size(); ++i) {
+        EXPECT_GE(results[i].distance, results[i-1].distance);
+    }
+}
+
+TEST_F(ANNTest, HighLevelWrapperMoveSemantics) {
+    std::vector<std::array<double, 2>> points = {{0.0, 0.0}, {1.0, 1.0}};
+    ANN::NearestNeighborSearch<2> nns1(points);
+    
+    ANN::NearestNeighborSearch<2> nns2 = std::move(nns1);
+    
+    EXPECT_EQ(nns1.size(), 0);
+    EXPECT_EQ(nns2.size(), 2);
+    
+    auto results = nns2.search({0.1, 0.1}, 1);
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0].index, 0);
+}
+
+TEST_F(ANNTest, HighLevelWrapperEmptyThrows) {
+    std::vector<std::array<double, 2>> points;
+    EXPECT_THROW(ANN::NearestNeighborSearch<2> nns(points), std::invalid_argument);
+}
 
 TEST_F(ANNTest, KdTreeBasicSearch) {
     std::unique_ptr<ANNkd_tree> kdTree(new ANNkd_tree(data_pts, max_pts, dim));
