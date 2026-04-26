@@ -91,22 +91,29 @@ TEST_F(ANNTest, HighLevelWrapperEmptyThrows) {
 }
 
 TEST_F(ANNTest, HighLevelWrapperExactMatch) {
-    std::vector<std::array<double, 2>> points = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}};
+    std::vector<std::array<double, 2>> points = {
+        {1.0, 1.0}, 
+        {2.0, 2.0}, 
+        {3.0, 3.0},
+        {2.0, 2.0} // Duplicate point
+    };
     ANN::NearestNeighborSearch<2> nns(points);
 
-    // Exact match exists
-    auto match = nns.findExactMatch({2.0, 2.0});
-    ASSERT_TRUE(match.has_value());
-    EXPECT_EQ(*match, 1);
+    // Exact match exists (should find two indices)
+    auto matches = nns.findExactMatch({2.0, 2.0});
+    EXPECT_EQ(matches.size(), 2);
+    // Sort to ensure order for testing
+    std::sort(matches.begin(), matches.end());
+    EXPECT_EQ(matches[0], 1);
+    EXPECT_EQ(matches[1], 3);
 
     // Exact match does not exist
-    auto no_match = nns.findExactMatch({2.1, 2.1});
-    EXPECT_FALSE(no_match.has_value());
+    auto no_matches = nns.findExactMatch({2.1, 2.1});
+    EXPECT_TRUE(no_matches.empty());
 
     // Match within tolerance
-    auto tolerance_match = nns.findExactMatch({2.1, 2.1}, 0.2);
-    ASSERT_TRUE(tolerance_match.has_value());
-    EXPECT_EQ(*tolerance_match, 1);
+    auto tolerance_matches = nns.findExactMatch({2.1, 2.1}, 0.2);
+    EXPECT_EQ(tolerance_matches.size(), 2);
 }
 
 TEST_F(ANNTest, KdTreeBasicSearch) {

@@ -128,18 +128,37 @@ public:
     }
 
     /**
-     * @brief Find a point that exactly matches the query.
+     * @brief Find all points that exactly match the query within a tolerance.
      * 
      * @param query The query point.
      * @param tolerance The distance tolerance (default 0.0 for bitwise exact).
-     * @return std::optional<int> The index of the matching point, or std::nullopt if not found.
+     * @return std::vector<int> A vector of indices of the matching points.
      */
-    [[nodiscard]] std::optional<int> findExactMatch(const Point& query, double tolerance = 0.0) const {
-        auto results = search(query, 1, 0.0);
-        if (!results.empty() && results[0].distance <= tolerance) {
-            return results[0].index;
+    [[nodiscard]] std::vector<int> findExactMatch(const Point& query, double tolerance = 0.0) const {
+        if (!kd_tree) return {};
+
+        // ANN uses squared distances for radius search
+        ANNdist sqRad = static_cast<ANNdist>(tolerance * tolerance);
+        ANNpoint q = const_cast<double*>(query.data());
+
+        // First pass: find out how many points are within the radius
+        int count = kd_tree->annkFRSearch(q, sqRad, 0, nullptr, nullptr);
+        
+        if (count <= 0) return {};
+
+        // Second pass: retrieve the indices
+        std::vector<ANNidx> nn_idx(count);
+        std::vector<ANNdist> dists(count);
+        kd_tree->annkFRSearch(q, sqRad, count, nn_idx.data(), dists.data());
+
+        std::vector<int> results;
+        results.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            if (nn_idx[i] != ANN_NULL_IDX) {
+                results.push_back(nn_idx[i]);
+            }
         }
-        return std::nullopt;
+        return results;
     }
 
     /**
