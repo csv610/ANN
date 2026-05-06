@@ -19,6 +19,14 @@ else()
     message(STATUS "OpenMP not found - tree construction will be single-threaded")
 endif()
 
+# Assimp for mesh loading
+find_package(assimp QUIET)
+if(assimp_FOUND)
+    message(STATUS "Assimp found: ${assimp_VERSION}")
+else()
+    message(STATUS "Assimp not found - mesh loading disabled")
+endif()
+
 # Include directories
 include_directories(include)
 include_directories(src)
@@ -96,6 +104,13 @@ target_link_libraries(ann_sample PRIVATE ANN)
 
 add_executable(high_level_sample sample/high_level_sample.cpp)
 target_link_libraries(high_level_sample PRIVATE ANN)
+
+add_executable(min_dist_stats sample/min_dist_stats.cpp)
+target_link_libraries(min_dist_stats PRIVATE ANN)
+if(assimp_FOUND)
+    target_link_libraries(min_dist_stats PRIVATE assimp::assimp)
+    target_compile_definitions(min_dist_stats PRIVATE ASSIMP_FOUND)
+endif()
 
 # Installation
 install(TARGETS ANN ann_test ann_sample
