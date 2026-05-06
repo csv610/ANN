@@ -43,7 +43,7 @@
 
 class ANNkd_node{						// generic kd-tree node (empty shell)
 public:
-	virtual ~ANNkd_node() {}					// virtual distroyer
+	virtual ~ANNkd_node() {}					// virtual destructor
 
 	virtual void ann_search(ANNdist) = 0;		// tree search
 	virtual void ann_pri_search(ANNdist) = 0;	// priority search

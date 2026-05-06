@@ -10,3 +10,7 @@ ann_sample
 ann_test
 ann2fig
 unit_tests
+*.swp
+*.swo
+*~
+compile_commands.json

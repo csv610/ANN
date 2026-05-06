@@ -1,0 +1,52 @@
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-sequences,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-static-cast-glvalues,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  misc-*,
+  -misc-noexcept-move-constructor,
+  modernize-*,
+  -modernize-avoid-bind,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  portability-*,
+  -portability-restrict-system-header-uses,
+  readability-*,
+  -readability-magic-sequences,
+  -readability-identifier-length,
+  -readability-function-size,
+  -readability-many-seeds-in-loop,
+  -readability-redundant-string-init
+
+WarningsAsErrors: ''
+
+CheckOptions:
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: underscore_
+  - key: readability-identifier-naming.ProtectedMemberPrefix
+    value: underscore_
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: CamelCase
+- key: performance-move-const-arg.TriggerOnMoveConst
+    value: 0
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: 1
+  - key: bugprone-reserved-identifier.IgnoredSuffixes
+    value: '_'
