@@ -17,14 +17,12 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Changed names LO, HI to ANN_LO, ANN_HI
 //----------------------------------------------------------------------
 
 #include "kd_search.h"					// kd-search declarations
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Approximate nearest neighbor searching by kd-tree search
@@ -77,7 +75,7 @@
 //----------------------------------------------------------------------
 
 thread_local int				ANNkdDim;				// dimension of space
-thread_local ANNpoint		ANNkdQ;					// query point
+thread_local ANNpointConst		ANNkdQ;					// query point
 thread_local double			ANNkdMaxErr;			// max tolerable squared error
 thread_local ANNpointArray	ANNkdPts;				// the points
 thread_local ANNmin_k		*ANNkdPointMK;			// set of k closest points
@@ -87,7 +85,7 @@ thread_local ANNmin_k		*ANNkdPointMK;			// set of k closest points
 //----------------------------------------------------------------------
 
 void ANNkd_tree::annkSearch(
-	ANNpoint			q,				// the query point
+	ANNpointConst			q,				// the query point
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor indices (returned)
 	ANNdistArray		dd,				// the approximate nearest neighbor
@@ -173,7 +171,7 @@ void ANNkd_leaf::ann_search(ANNdist box_dist)
 {
 	ANNdist dist;				// distance to data point
 	ANNcoord* pp;				// data coordinate pointer
-	ANNcoord* qq;				// query coordinate pointer
+	ANNpointConst qq;				// query coordinate pointer
 	ANNdist min_dist;			// distance to k-th closest point
 	ANNcoord t;
 	int d;
@@ -208,3 +206,5 @@ void ANNkd_leaf::ann_search(ANNdist box_dist)
 	ANN_PTS(n_pts)						// increment points visited
 	ANNptsVisited += n_pts;				// increment number of points visited
 }
+
+} // namespace ANN

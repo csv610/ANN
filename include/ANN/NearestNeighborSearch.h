@@ -112,8 +112,8 @@ public:
         std::vector<ANNidx> nn_idx(actual_k);
         std::vector<ANNdist> dists(actual_k);
 
-        // ANN uses non-const pointers internally but does not modify query point
-        ANNpoint q = const_cast<double*>(query.data());
+        // API now accepts const pointer
+        ANNpointConst q = query.data();
 
         kd_tree->annkSearch(q, actual_k, nn_idx.data(), dists.data(), eps);
 
@@ -139,7 +139,7 @@ public:
 
         // ANN uses squared distances for radius search
         ANNdist sqRad = static_cast<ANNdist>(tolerance * tolerance);
-        ANNpoint q = const_cast<double*>(query.data());
+        ANNpointConst q = query.data();
 
         // First pass: find out how many points are within the radius
         int count = kd_tree->annkFRSearch(q, sqRad, 0, nullptr, nullptr);

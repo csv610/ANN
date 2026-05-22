@@ -17,15 +17,13 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.1  05/03/05
-//		Added fixed-radius kNN search
 //----------------------------------------------------------------------
 
 #include <ANN/ANNx.h>					// all ANN includes
 #include "pr_queue_k.h"					// k element priority queue
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //		Brute-force search simply stores a pointer to the list of
@@ -33,7 +31,7 @@
 //		The k nearest neighbors are stored in a k-element priority
 //		queue (which is implemented in a pretty dumb way as well).
 //
-//		If ANN_ALLOW_SELF_MATCH is ANNfalse then data points at distance
+//		If ANN_ALLOW_SELF_MATCH is false then data points at distance
 //		zero are not considered.
 //
 //		Note that the error bound eps is passed in, but it is ignored.
@@ -52,7 +50,7 @@ ANNbruteForce::ANNbruteForce(			// constructor from point array
 ANNbruteForce::~ANNbruteForce() { }		// destructor (empty)
 
 void ANNbruteForce::annkSearch(			// approx k near neighbor search
-	ANNpoint			q,				// query point
+	ANNpointConst q,				// query point
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor indices (returned)
 	ANNdistArray		dd,				// dist to near neighbors (returned)
@@ -78,7 +76,7 @@ void ANNbruteForce::annkSearch(			// approx k near neighbor search
 }
 
 int ANNbruteForce::annkFRSearch(		// approx fixed-radius kNN search
-	ANNpoint			q,				// query point
+	ANNpointConst q,				// query point
 	ANNdist				sqRad,			// squared radius
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor array (returned)
@@ -99,11 +97,13 @@ int ANNbruteForce::annkFRSearch(		// approx fixed-radius kNN search
 		}
 	}
 	for (i = 0; i < k; i++) {			// extract the k closest points
-		if (dd != NULL)
+		if (dd != nullptr)
 			dd[i] = mk.ith_smallest_key(i);
-		if (nn_idx != NULL)
+		if (nn_idx != nullptr)
 			nn_idx[i] = mk.ith_smallest_info(i);
 	}
 
 	return pts_in_range;
 }
+
+} // namespace ANN

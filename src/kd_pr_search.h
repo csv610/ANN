@@ -17,9 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef ANN_kd_pr_search_H
@@ -32,6 +29,9 @@
 
 #include <ANN/ANNperf.h>				// performance evaluation
 
+namespace ANN {
+
+
 //----------------------------------------------------------------------
 //	Global variables
 //		Active for the life of each call to Appx_Near_Neigh() or
@@ -40,10 +40,13 @@
 
 extern thread_local double			ANNprEps;		// the error bound
 extern thread_local int				ANNprDim;		// dimension of space
-extern thread_local ANNpoint			ANNprQ;			// query point
+extern thread_local ANNpointConst ANNprQ;			// query point
 extern thread_local double			ANNprMaxErr;	// max tolerable squared error
 extern thread_local ANNpointArray	ANNprPts;		// the points
 extern thread_local ANNpr_queue		*ANNprBoxPQ;	// priority queue for boxes
 extern thread_local ANNmin_k			*ANNprPointMK;	// set of k closest points
+
+
+} // namespace ANN
 
 #endif

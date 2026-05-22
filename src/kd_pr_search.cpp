@@ -17,12 +17,12 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #include "kd_pr_search.h"				// kd priority search declarations
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Approximate nearest neighbor searching by priority search.
@@ -74,7 +74,7 @@
 
 thread_local double			ANNprEps;				// the error bound
 thread_local int				ANNprDim;				// dimension of space
-thread_local ANNpoint		ANNprQ;					// query point
+thread_local ANNpointConst ANNprQ;					// query point
 thread_local double			ANNprMaxErr;			// max tolerable squared error
 thread_local ANNpointArray	ANNprPts;				// the points
 thread_local ANNpr_queue		*ANNprBoxPQ;			// priority queue for boxes
@@ -85,7 +85,7 @@ thread_local ANNmin_k		*ANNprPointMK;			// set of k closest points
 //----------------------------------------------------------------------
 
 void ANNkd_tree::annkPriSearch(
-	ANNpoint			q,				// query point
+	ANNpointConst			q,				// query point
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor indices (returned)
 	ANNdistArray		dd,				// dist to near neighbors (returned)
@@ -182,7 +182,7 @@ void ANNkd_leaf::ann_pri_search(ANNdist box_dist)
 {
 	ANNdist dist;				// distance to data point
 	ANNcoord* pp;				// data coordinate pointer
-	ANNcoord* qq;				// query coordinate pointer
+	ANNpointConst qq;				// query coordinate pointer
 	ANNdist min_dist;			// distance to k-th closest point
 	ANNcoord t;
 	int d;
@@ -217,3 +217,5 @@ void ANNkd_leaf::ann_pri_search(ANNdist box_dist)
 	ANN_PTS(n_pts)						// increment points visited
 	ANNptsVisited += n_pts;				// increment number of points visited
 }
+
+} // namespace ANN

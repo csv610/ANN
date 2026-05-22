@@ -17,13 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision l.0  04/01/05
-//		Fixed centroid shrink threshold condition to depend on the
-//			dimension.
-//		Moved dump routine to kd_dump.cpp.
 //----------------------------------------------------------------------
 
 #include "bd_tree.h"					// bd-tree declarations
@@ -32,6 +25,9 @@
 #include <iostream>					// I/O streams
 
 #include <ANN/ANNperf.h>				// performance evaluation
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Printing a bd-tree 
@@ -402,7 +398,7 @@ ANNkd_ptr rbd_tree(				// recursive construction of bd-tree
 		ANNkd_ptr out = rbd_tree(		// build outer subtree pidx[n_in..n]
 				pa, pidx+n_in, n - n_in, dim, bsp, bnd_box, splitter, shrink);
 
-		ANNorthHSArray bnds = NULL;		// bounds (alloc in Box2Bnds and
+		ANNorthHSArray bnds = nullptr;		// bounds (alloc in Box2Bnds and
 										// ...freed in bd_shrink destroyer)
 
 		annBox2Bnds(					// convert inner box to bounds
@@ -416,3 +412,5 @@ ANNkd_ptr rbd_tree(				// recursive construction of bd-tree
 		return new ANNbd_shrink(n_bnds, bnds, in, out);
 	}
 } 
+
+} // namespace ANN

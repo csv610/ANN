@@ -13,6 +13,7 @@
 #endif
 
 #include <ANN/NearestNeighborSearch.h>
+using namespace ANN;
 
 #ifdef ASSIMP_FOUND
 

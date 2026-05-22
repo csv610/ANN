@@ -23,6 +23,7 @@
 #include <cstring>						// string manipulation
 #include <fstream>						// file I/O
 #include <ANN/ANN.h>					// ANN declarations
+using namespace ANN;
 
 using namespace std;					// make std:: accessible
 

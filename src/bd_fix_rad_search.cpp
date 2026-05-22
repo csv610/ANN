@@ -17,13 +17,13 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 1.1  05/03/05
-//		Initial release
 //----------------------------------------------------------------------
 
 #include "bd_tree.h"					// bd-tree declarations
 #include "kd_fix_rad_search.h"			// kd-tree FR search declarations
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Approximate searching for bd-trees.
@@ -59,3 +59,5 @@ void ANNbd_shrink::ann_FR_search(ANNdist box_dist)
 	ANN_FLOP(3*n_bnds)							// increment floating ops
 	ANN_SHR(1)									// one more shrinking node
 }
+
+} // namespace ANN

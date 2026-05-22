@@ -24,13 +24,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-//	History:
-//	Revision 0.1  03/04/98
-//	    Initial release
-//	Revision 1.0  04/01/05
-//	    Changed LO, HI, IN, OUT to ANN_LO, ANN_HI, etc.
-//	Revision 1.1.2  01/27/10
-//		Fixed minor compilation bugs for new versions of gcc
 //----------------------------------------------------------------------
 
 /**
@@ -44,6 +37,9 @@
 
 #include <iomanip>				// I/O manipulators
 #include <ANN/ANN.h>			// ANN includes
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Global constants and types
@@ -73,7 +69,7 @@ void annError(					// ANN error routine
 	ANNerr			level);		// level of error
 
 void annPrintPt(				// print a point
-	ANNpoint		pt,			// the point
+	ANNpointConst pt,			// the point
 	int				dim,		// the dimension
 	std::ostream	&out);		// output stream
 
@@ -130,7 +126,7 @@ public:
 	~ANNorthRect() noexcept				// destructor
     {  annDeallocPt(lo);  annDeallocPt(hi);  }
 
-	[[nodiscard]] ANNbool inside(int dim, ANNpoint p) const noexcept;	// is point p inside rectangle?
+	[[nodiscard]] bool inside(int dim, ANNpointConst p) const noexcept;	// is point p inside rectangle?
 };
 
 void annAssignRect(				// assign one rect to another
@@ -161,19 +157,19 @@ public:
 	int				sdd)		// side
 	{  cd = cdd;  cv = cvv;  sd = sdd;  }
 
-	ANNbool in(ANNpoint q) const noexcept	// is q inside halfspace?
+	bool in(ANNpointConst q) const noexcept	// is q inside halfspace?
 	{  return  (q[cd] - cv)*sd >= 0;  }
 
-	ANNbool out(ANNpoint q) const noexcept	// is q outside halfspace?
+	bool out(ANNpointConst q) const noexcept	// is q outside halfspace?
 	{  return  (q[cd] - cv)*sd < 0;  }
 
-	[[nodiscard]] ANNdist dist(ANNpoint q) const noexcept	// (squared) distance from q
+	[[nodiscard]] ANNdist dist(ANNpointConst q) const noexcept	// (squared) distance from q
 	{  return  ANN_POW(q[cd] - cv);  }
 
-	void setLowerBound(int d, ANNpoint p) noexcept	// set to lower bound at p[i]
+	void setLowerBound(int d, ANNpointConst p) noexcept	// set to lower bound at p[i]
 	{  cd = d;  cv = p[d];  sd = +1;  }
 
-	void setUpperBound(int d, ANNpoint p) noexcept	// set to upper bound at p[i]
+	void setUpperBound(int d, ANNpointConst p) noexcept	// set to upper bound at p[i]
 	{  cd = d;  cv = p[d];  sd = -1;  }
 
 	void project(ANNpoint &q) noexcept		// project q (modified) onto halfspace
@@ -182,5 +178,8 @@ public:
 
 								// array of halfspaces
 typedef ANNorthHalfSpace *ANNorthHSArray;
+
+
+} // namespace ANN
 
 #endif

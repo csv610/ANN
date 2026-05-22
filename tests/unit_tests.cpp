@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <ANN/ANN.h>
+using namespace ANN;
 #include <ANN/NearestNeighborSearch.h>
 #include <memory>
 #include <vector>

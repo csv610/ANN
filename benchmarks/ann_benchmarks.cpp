@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <ANN/ANN.h>
+using namespace ANN;
 #include <ANN/NearestNeighborSearch.h>
 #include <vector>
 #include <random>

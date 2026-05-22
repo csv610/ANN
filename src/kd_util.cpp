@@ -17,14 +17,14 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #include "kd_util.h"					// kd-utility declarations
 
 #include <ANN/ANNperf.h>				// performance evaluation
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 // The following routines are utility functions for manipulating
@@ -122,9 +122,9 @@ void annEnclCube(						// compute smallest enclosing cube
 //----------------------------------------------------------------------
 
 ANNdist annBoxDistance(			// compute distance from point to box
-	const ANNpoint		q,				// the point
-	const ANNpoint		lo,				// low point of box
-	const ANNpoint		hi,				// high point of box
+	ANNpointConst q,				// the point
+	ANNpointConst		lo,				// low point of box
+	ANNpointConst		hi,				// high point of box
 	int					dim)			// dimension of space
 {
 	ANNdist dist = 0.0;		// sum of squared distances
@@ -437,3 +437,5 @@ void annBnds2Box(
 		bnds[i].project(inner_box.hi);
 	}
 }
+
+} // namespace ANN

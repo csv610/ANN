@@ -17,15 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Increased aspect ratio bound (ANN_AR_TOOBIG) from 100 to 1000.
-//		Fixed leaf counts to count trivial leaves.
-//		Added optional pa, pi arguments to Skeleton kd_tree constructor
-//			for use in load constructor.
-//		Added annClose() to eliminate KD_TRIVIAL memory leak.
 //----------------------------------------------------------------------
 
 #include "kd_tree.h"					// kd-tree declarations
@@ -35,6 +26,9 @@
 
 #ifdef _OPENMP
 #include <omp.h>
+
+namespace ANN {
+
 #endif
 
 //----------------------------------------------------------------------
@@ -51,7 +45,7 @@
 //	one tree).
 //----------------------------------------------------------------------
 static int				IDX_TRIVIAL[] = {0};	// trivial point index
-ANNkd_leaf				*KD_TRIVIAL = NULL;		// trivial leaf node
+ANNkd_leaf				*KD_TRIVIAL = nullptr;		// trivial leaf node
 
 //----------------------------------------------------------------------
 //	Printing the kd-tree 
@@ -106,10 +100,10 @@ void ANNkd_leaf::print(					// print leaf node
 }
 
 void ANNkd_tree::Print(					// print entire tree
-		ANNbool with_pts,				// print points as well?
+		bool with_pts,				// print points as well?
 		std::ostream &out)					// output stream
 {
-	out << "ANN Version " << ANNversion << "\n";
+	out << "ANN Version " << ANN_VERSION << "\n";
 	if (with_pts) {						// print point coordinates
 		out << "    Points:\n";
 		for (int i = 0; i < n_pts; i++) {
@@ -118,7 +112,7 @@ void ANNkd_tree::Print(					// print entire tree
 			out << "\n";
 		}
 	}
-	if (root == NULL)					// empty tree?
+	if (root == nullptr)					// empty tree?
 		out << "    Null tree.\n";
 	else {
 		root->print(0, out);			// invoke printing at root
@@ -198,7 +192,7 @@ void ANNkd_tree::getStats(						// get tree statistics
 	st.reset(dim, n_pts, bkt_size);				// reset stats
 												// create bounding box
 	ANNorthRect bnd_box(dim, bnd_box_lo, bnd_box_hi);
-	if (root != NULL) {							// if nonempty tree
+	if (root != nullptr) {							// if nonempty tree
 		root->getStats(dim, st, bnd_box);		// get statistics
 		st.avg_ar = st.sum_ar / st.n_lf;		// average leaf asp ratio
 	}
@@ -212,10 +206,10 @@ void ANNkd_tree::getStats(						// get tree statistics
 
 ANNkd_tree::~ANNkd_tree()				// tree destructor
 {
-	if (root != NULL) delete root;
-	if (pidx != NULL) delete [] pidx;
-	if (bnd_box_lo != NULL) annDeallocPt(bnd_box_lo);
-	if (bnd_box_hi != NULL) annDeallocPt(bnd_box_hi);
+	if (root != nullptr) delete root;
+	if (pidx != nullptr) delete [] pidx;
+	if (bnd_box_lo != nullptr) annDeallocPt(bnd_box_lo);
+	if (bnd_box_hi != nullptr) annDeallocPt(bnd_box_hi);
 }
 
 //----------------------------------------------------------------------
@@ -224,9 +218,9 @@ ANNkd_tree::~ANNkd_tree()				// tree destructor
 //----------------------------------------------------------------------
 void annClose()				// close use of ANN
 {
-	if (KD_TRIVIAL != NULL) {
+	if (KD_TRIVIAL != nullptr) {
 		delete KD_TRIVIAL;
-		KD_TRIVIAL = NULL;
+		KD_TRIVIAL = nullptr;
 	}
 }
 
@@ -257,9 +251,9 @@ void ANNkd_tree::SkeletonTree(			// construct skeleton tree
 	bkt_size = bs;
 	pts = pa;							// initialize points array
 
-	root = NULL;						// no associated tree yet
+	root = nullptr;						// no associated tree yet
 
-	if (pi == NULL) {					// point indices provided?
+	if (pi == nullptr) {					// point indices provided?
 		pidx = new ANNidx[n];			// no, allocate space for point indices
 		for (int i = 0; i < n; i++) {
 			pidx[i] = i;				// initially identity
@@ -269,8 +263,8 @@ void ANNkd_tree::SkeletonTree(			// construct skeleton tree
 		pidx = pi;						// yes, use them
 	}
 
-	bnd_box_lo = bnd_box_hi = NULL;		// bounding box is nonexistent
-	if (KD_TRIVIAL == NULL)				// no trivial leaf node yet?
+	bnd_box_lo = bnd_box_hi = nullptr;		// bounding box is nonexistent
+	if (KD_TRIVIAL == nullptr)				// no trivial leaf node yet?
 		KD_TRIVIAL = new ANNkd_leaf(0, IDX_TRIVIAL);	// allocate it
 }
 
@@ -435,3 +429,5 @@ ANNkd_tree::ANNkd_tree(					// construct from point array
 		annError("Illegal splitting method", ANNabort);
 	}
 }
+
+} // namespace ANN

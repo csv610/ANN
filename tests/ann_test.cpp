@@ -45,6 +45,7 @@
 #include <ANN/ANN.h>					// ANN declarations
 #include <ANN/ANNx.h>					// more ANN declarations
 #include <ANN/ANNperf.h>				// performance evaluation
+using namespace ANN;
 
 #include "rand.h"						// random point generation
 
@@ -583,12 +584,12 @@ void initGlobals()
 	min_pts_in_range	= NULL;
 	max_pts_in_range	= NULL;
 
-	valid_dirty			= ANNtrue;				// (validation must be done)
+	valid_dirty			= true;				// (validation must be done)
 }
 
 //------------------------------------------------------------------------
 // getDirective - skip comments and read next directive
-//	Returns ANNtrue if directive read, and ANNfalse if eof seen.
+//	Returns true if directive read, and ANNfalse if eof seen.
 //------------------------------------------------------------------------
 
 ANNbool skipComment(				// skip any comments
@@ -605,7 +606,7 @@ ANNbool skipComment(				// skip any comments
     }
     if (in.eof()) return ANNfalse;			// end of file
     in.putback(ch);				// put character back
-    return ANNtrue;
+    return true;
 }
 
 ANNbool getDirective(
@@ -615,7 +616,7 @@ ANNbool getDirective(
     if (!skipComment(in))			// skip comments
     	return ANNfalse;			// found eof along the way?
     in >> directive;				// read directive
-    return ANNtrue;
+    return true;
 }
 
 //------------------------------------------------------------------------
@@ -632,7 +633,7 @@ int main(int argc, char** argv)
 	std::string	arg;						// all-purpose argument
 
 	cout << "------------------------------------------------------------\n"
-		 << "ann_test: Version " << ANNversion << " " << ANNversionCmt << "\n"
+		 << "ann_test: Version " << ANN_VERSION << " " << ANNversionCmt << "\n"
 		 << "    Copyright: " << ANNcopyright << ".\n"
 		 << "    Latest Revision: " << ANNlatestRev << ".\n"
 		 << "------------------------------------------------------------\n\n";
@@ -654,7 +655,7 @@ int main(int argc, char** argv)
 			cin >> n_color;
 		}
 		else if (directive == "new_clust") {
-			new_clust = ANNtrue;
+			new_clust = true;
 		}
 		else if (directive == "max_clus_dim") {
 			cin >> max_dim;
@@ -685,20 +686,20 @@ int main(int argc, char** argv)
 		}
 		else if (directive == "max_pts_visit") {
 			cin >> max_pts_visit;
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		else if (directive == "radius_bound") {
 			cin >> radius_bound;
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		else if (directive == "near_neigh") {
 			cin >> near_neigh;
 			true_nn = near_neigh + extra_nn;	// also reset true near neighs
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		else if (directive == "true_near_neigh") {
 			cin >> true_nn;
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		//----------------------------------------------------------------
 		//	seed option
@@ -715,7 +716,7 @@ int main(int argc, char** argv)
 		else if (directive == "validate") {
 			cin >> arg;							// input argument
 			if (arg ==  "on") {
-				validate = ANNtrue;
+				validate = true;
 				cout << "validate = on   "
 					 << "(Warning: this may slow execution time.)\n";
 			}
@@ -793,7 +794,7 @@ int main(int argc, char** argv)
 				data_size,						// data size
 				DATA,							// data points
 				new_clust);						// new clusters flag
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 			new_clust = ANNfalse;				// reset flag
 		}
 		//----------------------------------------------------------------
@@ -822,7 +823,7 @@ int main(int argc, char** argv)
 					QUERY,						// query points
 					new_clust);					// new clusters flag
 			}
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 			new_clust = ANNfalse;				// reset flag
 		}
 		//----------------------------------------------------------------
@@ -835,7 +836,7 @@ int main(int argc, char** argv)
 				data_size,						// number of points
 				arg,							// file name
 				DATA);							// data points
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		//----------------------------------------------------------------
 		//	read_query_pts operation
@@ -847,7 +848,7 @@ int main(int argc, char** argv)
 				query_size,						// number of points
 				arg,							// file name
 				QUERY);							// query points
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 		}
 		//----------------------------------------------------------------
 		//	build_ann operation
@@ -891,7 +892,7 @@ int main(int argc, char** argv)
 				}
 
 				if (stats >= PREP_STATS)		// output or check tree stats
-					treeStats(cout, ANNtrue);	// print tree stats
+					treeStats(cout, true);	// print tree stats
 				else
 					treeStats(cout, ANNfalse);	// check stats
 
@@ -919,7 +920,7 @@ int main(int argc, char** argv)
 					Error("Cannot open dump file", ANNabort);
 				}
 												// dump the tree and points
-				the_tree->Dump(ANNtrue, out_dump_file);
+				the_tree->Dump(true, out_dump_file);
 				if (stats > SILENT) {
 					cout << "(Tree has been dumped to file " << arg << ")\n";
 				}
@@ -951,7 +952,7 @@ int main(int argc, char** argv)
 			data_size = the_tree->nPoints();	// number of points
 			data_pts = the_tree->thePoints();	// new points
 
-			valid_dirty = ANNtrue;				// validation must be redone
+			valid_dirty = true;				// validation must be redone
 
 			if (stats > SILENT) {
 					cout << "(Tree has been loaded from file " << arg << ")\n";
@@ -1588,7 +1589,7 @@ void treeStats(
 		out << "Warning: The tree has more than 10x as many nodes as points.\n";
 		out << "You may want to consider a different split or shrink method.\n";
 		out << "-----------------------------------------------------------\n";
-		verbose = ANNtrue;
+		verbose = true;
 	}
 												// fraction of trivial leaves
 	float frac_tl = (st.n_lf == 0 ? 0 : ((float) st.n_tl)/ st.n_lf);
@@ -1597,7 +1598,7 @@ void treeStats(
 		out << "Warning: A significant fraction of leaves contain no points.\n";
 		out << "You may want to consider a different split or shrink method.\n";
 		out << "-----------------------------------------------------------\n";
-		verbose = ANNtrue;
+		verbose = true;
 	}
 												// depth should be O(dim*log n)
 	int too_many_levels = (int) (2.0 * st.dim * log2((double) st.n_pts));
@@ -1607,7 +1608,7 @@ void treeStats(
 		out << "Warning: The tree is more than 2x as deep as (dim*log n).\n";
 		out << "You may want to consider a different split or shrink method.\n";
 		out << "-----------------------------------------------------------\n";
-		verbose = ANNtrue;
+		verbose = true;
 	}
 												// average leaf aspect ratio
 	if (st.n_pts >= MIN_PTS && st.avg_ar > MAX_AVG_AR) {
@@ -1615,7 +1616,7 @@ void treeStats(
 		out << "Warning: Average aspect ratio of cells is quite large.\n";
 		out << "This may slow queries depending on the point distribution.\n";
 		out << "-----------------------------------------------------------\n";
-		verbose = ANNtrue;
+		verbose = true;
 	}
 
 	//------------------------------------------------------------------

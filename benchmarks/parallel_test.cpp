@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <ANN/ANN.h>
+using namespace ANN;
 #include <random>
 #include <cstdlib>
 

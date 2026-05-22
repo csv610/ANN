@@ -17,12 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Moved dump out of kd_tree.cc into this file.
-//		Added kd-tree load constructor.
 //----------------------------------------------------------------------
 // This file contains routines for dumping kd-trees and bd-trees and
 // reloading them. (It is an abuse of policy to include both kd- and
@@ -33,6 +27,9 @@
 
 #include "kd_tree.h"					// kd-tree declarations
 #include "bd_tree.h"					// bd-tree declarations
+
+namespace ANN {
+
 
 using namespace std;					// make std:: available
 
@@ -100,10 +97,10 @@ static ANNkd_ptr annReadTree(			// read tree-part of dump file
 //----------------------------------------------------------------------
 
 void ANNkd_tree::Dump(					// dump entire tree
-		ANNbool with_pts,				// print points as well?
+		bool with_pts,				// print points as well?
 		std::ostream &out)					// output stream
 {
-	out << "#ANN " << ANNversion << "\n";
+	out << "#ANN " << ANN_VERSION << "\n";
 	out.precision(ANNcoordPrec);		// use full precision in dumping
 	if (with_pts) {						// print point coordinates
 		out << "points " << dim << " " << n_pts << "\n";
@@ -123,7 +120,7 @@ void ANNkd_tree::Dump(					// dump entire tree
 	annPrintPt(bnd_box_hi, dim, out);	// print upper bound
 	out << "\n";
 
-	if (root == NULL)					// empty tree?
+	if (root == nullptr)					// empty tree?
 		out << "null\n";
 	else {
 		root->dump(out);				// invoke printing at root
@@ -264,7 +261,7 @@ static ANNkd_ptr annReadDump(
 	int j;
 	char str[STRING_LEN];						// storage for string
 	char version[STRING_LEN];					// ANN version number
-	ANNkd_ptr the_root = NULL;
+	ANNkd_ptr the_root = nullptr;
 
 	//------------------------------------------------------------------
 	//	Input file header
@@ -383,7 +380,7 @@ static ANNkd_ptr annReadTree(
 	in >> tag;									// input node tag
 
 	if (strcmp(tag, "null") == 0) {				// null tree
-		return NULL;
+		return nullptr;
 	}
 	//------------------------------------------------------------------
 	//	Read a leaf
@@ -442,3 +439,5 @@ static ANNkd_ptr annReadTree(
 		exit(0);								// to keep the compiler happy
 	}
 }
+
+} // namespace ANN

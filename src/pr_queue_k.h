@@ -17,9 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef PR_QUEUE_K_H
@@ -27,6 +24,9 @@
 
 #include <ANN/ANNx.h>					// all ANN includes
 #include <ANN/ANNperf.h>				// performance evaluation
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Basic types
@@ -36,22 +36,22 @@ typedef int				PQKinfo;		// info field is int
 
 //----------------------------------------------------------------------
 //	Constants
-//		The NULL key value is used to initialize the priority queue, and
+//		The nullptr key value is used to initialize the priority queue, and
 //		so it should be larger than any valid distance, so that it will
-//		be replaced as legal distance values are inserted.  The NULL
+//		be replaced as legal distance values are inserted.  The nullptr
 //		info value must be a nonvalid array index, we use ANN_NULL_IDX,
 //		which is guaranteed to be negative.
 //----------------------------------------------------------------------
 
-const PQKkey	PQ_NULL_KEY  =  ANN_DIST_INF;	// nonexistent key value
-const PQKinfo	PQ_NULL_INFO =  ANN_NULL_IDX;	// nonexistent info value
+const PQKkey	PQ_nullptr_KEY  =  ANN_DIST_INF;	// nonexistent key value
+const PQKinfo	PQ_nullptr_INFO =  ANN_NULL_IDX;	// nonexistent info value
 
 //----------------------------------------------------------------------
 //	ANNmin_k
 //		An ANNmin_k structure is one which maintains the smallest
 //		k values (of type PQKkey) and associated information (of type
-//		PQKinfo).  The special info and key values PQ_NULL_INFO and
-//		PQ_NULL_KEY means that thise entry is empty.
+//		PQKinfo).  The special info and key values PQ_nullptr_INFO and
+//		PQ_nullptr_KEY means that thise entry is empty.
 //
 //		It is currently implemented using an array with k items.
 //		Items are stored in increasing sorted order, and insertions
@@ -85,16 +85,16 @@ public:
 		{ delete [] mk; }
 	
 	PQKkey ANNmin_key()					// return minimum key
-		{ return (n > 0 ? mk[0].key : PQ_NULL_KEY); }
+		{ return (n > 0 ? mk[0].key : PQ_nullptr_KEY); }
 	
 	PQKkey max_key()					// return maximum key
-		{ return (n == k ? mk[k-1].key : PQ_NULL_KEY); }
+		{ return (n == k ? mk[k-1].key : PQ_nullptr_KEY); }
 	
 	PQKkey ith_smallest_key(int i)		// ith smallest key (i in [0..n-1])
-		{ return (i < n ? mk[i].key : PQ_NULL_KEY); }
+		{ return (i < n ? mk[i].key : PQ_nullptr_KEY); }
 	
 	PQKinfo ith_smallest_info(int i)	// info for ith smallest (i in [0..n-1])
-		{ return (i < n ? mk[i].info : PQ_NULL_INFO); }
+		{ return (i < n ? mk[i].info : PQ_nullptr_INFO); }
 
 	inline void insert(					// insert item (inlined for speed)
 		PQKkey kv,						// key value
@@ -114,5 +114,8 @@ public:
 			ANN_FLOP(k-i+1)				// increment floating ops
 		}
 };
+
+
+} // namespace ANN
 
 #endif

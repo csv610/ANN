@@ -37,6 +37,7 @@
 #include <cstdlib>						// standard includes (rand/random)
 #include <cmath>						// math routines
 #include <ANN/ANN.h>					// basic ANN includes
+using namespace ANN;
 
 //----------------------------------------------------------------------
 //	Although random/srandom is a more reliable random number generator,

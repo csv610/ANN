@@ -17,15 +17,15 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef ANN_KD_SPLIT_H
 #define ANN_KD_SPLIT_H
 
 #include "kd_tree.h"					// kd-tree definitions
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	External entry points
@@ -81,5 +81,8 @@ void sl_fair_split(						// sliding fair-split kd-splitter
 	int					&cut_dim,		// cutting dimension (returned)
 	ANNcoord			&cut_val,		// cutting value (returned)
 	int					&n_lo);			// num of points on low side (returned)
+
+
+} // namespace ANN
 
 #endif

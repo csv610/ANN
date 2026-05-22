@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <ANN/NearestNeighborSearch.h>
+using namespace ANN;
 
 int main() {
     // 1. Define the dimension of our points

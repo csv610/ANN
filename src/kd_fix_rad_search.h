@@ -17,9 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 1.1  05/03/05
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef ANN_kd_fix_rad_search_H
@@ -31,6 +28,9 @@
 
 #include <ANN/ANNperf.h>				// performance evaluation
 
+namespace ANN {
+
+
 //----------------------------------------------------------------------
 //	Global variables
 //		These are active for the life of each call to
@@ -39,6 +39,9 @@
 //		procedures.
 //----------------------------------------------------------------------
 
-extern ANNpoint			ANNkdFRQ;			// query point (static copy)
+extern ANNpointConst ANNkdFRQ;			// query point (static copy)
+
+
+} // namespace ANN
 
 #endif

@@ -17,17 +17,15 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.1  05/03/05
-//		Added fixed radius kNN search
 //----------------------------------------------------------------------
 
 #ifndef ANN_kd_tree_H
 #define ANN_kd_tree_H
 
 #include <ANN/ANNx.h>					// all ANN includes
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Generic kd-tree node
@@ -118,7 +116,7 @@ virtual void print(int level, std::ostream &out);// print node
 //		some splitting rules generate many (more than 50%) trivial
 //		leaves, we use this one shared node to save space.
 //
-//		The pointer is initialized to NULL, but whenever a kd-tree is
+//		The pointer is initialized to nullptr, but whenever a kd-tree is
 //		created, we allocate this node, if it has not already been
 //		allocated. This node is *never* deallocated, so it produces
 //		a small memory leak.
@@ -149,7 +147,7 @@ public:
 		int cd,							// cutting dimension
 		ANNcoord cv,					// cutting value
 		ANNcoord lv, ANNcoord hv,				// low and high values
-		ANNkd_ptr lc=NULL, ANNkd_ptr hc=NULL)	// children
+		ANNkd_ptr lc=nullptr, ANNkd_ptr hc=nullptr)	// children
 		{
 			cut_dim		= cd;					// cutting dimension
 			cut_val		= cv;					// cutting value
@@ -161,9 +159,9 @@ public:
 
 	~ANNkd_split()						// destructor
 		{
-			if (child[ANN_LO]!= NULL && child[ANN_LO]!= KD_TRIVIAL)
+			if (child[ANN_LO]!= nullptr && child[ANN_LO]!= KD_TRIVIAL)
 				delete child[ANN_LO];
-			if (child[ANN_HI]!= NULL && child[ANN_HI]!= KD_TRIVIAL)
+			if (child[ANN_HI]!= nullptr && child[ANN_HI]!= KD_TRIVIAL)
 				delete child[ANN_HI];
 		}
 
@@ -191,5 +189,8 @@ ANNkd_ptr rkd_tree(				// recursive construction of kd-tree
 	int					bsp,			// bucket space
 	ANNorthRect			&bnd_box,		// bounding box for current node
 	ANNkd_splitter		splitter);		// splitting routine
+
+
+} // namespace ANN
 
 #endif

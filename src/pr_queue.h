@@ -18,9 +18,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef PR_QUEUE_H
@@ -28,6 +25,9 @@
 
 #include <ANN/ANNx.h>					// all ANN includes
 #include <ANN/ANNperf.h>				// performance evaluation
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Basic types.
@@ -72,10 +72,10 @@ public:
 	~ANNpr_queue() noexcept						// destructor
 		{ delete [] pq; }
 
-	[[nodiscard]] ANNbool empty() const noexcept			// is queue empty?
+	[[nodiscard]] bool empty() const noexcept			// is queue empty?
 		{ return n == 0; }
 
-	[[nodiscard]] ANNbool non_empty() const noexcept		// is queue nonempty?
+	[[nodiscard]] bool non_empty() const noexcept		// is queue nonempty?
 		{ return n != 0; }
 
 	void reset() noexcept							// make existing queue empty
@@ -121,5 +121,8 @@ public:
  			pq[p] = pq[n+1];			// insert last item in proper place
  		}
 };
+
+
+} // namespace ANN
 
 #endif

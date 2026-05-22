@@ -17,15 +17,14 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
 //----------------------------------------------------------------------
 
 #include "kd_tree.h"					// kd-tree definitions
 #include "kd_util.h"					// kd-tree utilities
 #include "kd_split.h"					// splitting functions
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Constants
@@ -426,3 +425,5 @@ void sl_fair_split(
 		annMedianSplit(pa, pidx, n, cut_dim, cut_val, n_lo);
 	}
 }
+
+} // namespace ANN

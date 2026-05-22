@@ -17,11 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Changed IN, OUT to ANN_IN, ANN_OUT
 //----------------------------------------------------------------------
 
 #ifndef ANN_bd_tree_H
@@ -29,6 +24,9 @@
 
 #include <ANN/ANNx.h>					// all ANN includes
 #include "kd_tree.h"					// kd-tree includes
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	bd-tree shrinking node.
@@ -67,7 +65,7 @@ public:
 	ANNbd_shrink(						// constructor
 		int				nb,				// number of bounding halfspaces
 		ANNorthHSArray	bds,			// list of bounding halfspaces
-		ANNkd_ptr ic=NULL, ANNkd_ptr oc=NULL)	// children
+		ANNkd_ptr ic=nullptr, ANNkd_ptr oc=nullptr)	// children
 		{
 			n_bnds			= nb;				// cutting dimension
 			bnds			= bds;				// assign bounds
@@ -77,11 +75,11 @@ public:
 
 	~ANNbd_shrink()						// destructor
 		{
-			if (child[ANN_IN]!= NULL && child[ANN_IN]!=  KD_TRIVIAL) 
+			if (child[ANN_IN]!= nullptr && child[ANN_IN]!=  KD_TRIVIAL) 
 				delete child[ANN_IN];
-			if (child[ANN_OUT]!= NULL&& child[ANN_OUT]!= KD_TRIVIAL) 
+			if (child[ANN_OUT]!= nullptr&& child[ANN_OUT]!= KD_TRIVIAL) 
 				delete child[ANN_OUT];
-			if (bnds != NULL)
+			if (bnds != nullptr)
 				delete [] bnds;			// delete bounds
 		}
 
@@ -96,5 +94,8 @@ virtual void getStats(						// get tree statistics
 	virtual void ann_pri_search(ANNdist);		// priority search
 	virtual void ann_FR_search(ANNdist); 		// fixed-radius search
 };
+
+
+} // namespace ANN
 
 #endif

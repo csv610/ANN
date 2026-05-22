@@ -1,9 +1,27 @@
 cmake_minimum_required(VERSION 3.16)
 project(ANN VERSION 1.1.2)
 
-set(CMAKE_CXX_STANDARD 17)
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Version configuration
+set(ANN_VERSION_MAJOR ${ANN_PROJECT_VERSION_MAJOR})
+set(ANN_VERSION_MINOR ${ANN_PROJECT_VERSION_MINOR})
+set(ANN_VERSION_PATCH ${ANN_PROJECT_VERSION_PATCH})
+set(ANN_VERSION ${ANN_PROJECT_VERSION})
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/ANN/Config.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/ANN/Config.h
+)
 
 if(MSVC)
     add_compile_options(/W4 /permissive-)
@@ -27,9 +45,43 @@ else()
     message(STATUS "Assimp not found - mesh loading disabled")
 endif()
 
-# Include directories
-include_directories(include)
-include_directories(src)
+# ANN Library
+set(ANN_HEADERS
+    include/ANN/ANN.h
+    include/ANN/ANNperf.h
+    include/ANN/ANNx.h
+    include/ANN/NearestNeighborSearch.h
+    ${CMAKE_CURRENT_BINARY_DIR}/include/ANN/Config.h
+)
+
+set(ANN_SOURCES
+    src/ANN.cpp
+    src/bd_fix_rad_search.cpp
+    src/bd_pr_search.cpp
+    src/bd_search.cpp
+    src/bd_tree.cpp
+    src/brute.cpp
+    src/kd_dump.cpp
+    src/kd_fix_rad_search.cpp
+    src/kd_pr_search.cpp
+    src/kd_search.cpp
+    src/kd_split.cpp
+    src/kd_tree.cpp
+    src/kd_util.cpp
+    src/perf.cpp
+)
+
+set(ANN_INTERNAL_HEADERS
+    src/bd_tree.h
+    src/kd_fix_rad_search.h
+    src/kd_pr_search.h
+    src/kd_search.h
+    src/kd_split.h
+    src/kd_tree.h
+    src/kd_util.h
+    src/pr_queue_k.h
+    src/pr_queue.h
+)
 
 # Optional AddressSanitizer support
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
@@ -42,13 +94,22 @@ if(ENABLE_ASAN)
     endif()
 endif()
 
-# ANN Library
-file(GLOB ANN_SOURCES "src/*.cpp")
-add_library(ANN STATIC ${ANN_SOURCES})
+add_library(ANN STATIC ${ANN_SOURCES} ${ANN_HEADERS} ${ANN_INTERNAL_HEADERS})
+
+target_include_directories(ANN 
+    PUBLIC 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE 
+        src
+)
+
 if(ASAN_FLAGS)
     target_compile_options(ANN PUBLIC ${ASAN_FLAGS})
     target_link_options(ANN PUBLIC ${ASAN_FLAGS})
 endif()
+
 if(OpenMP_CXX_FOUND)
     target_link_libraries(ANN PUBLIC OpenMP::OpenMP_CXX)
 endif()
@@ -113,9 +174,17 @@ if(assimp_FOUND)
 endif()
 
 # Installation
-install(TARGETS ANN ann_test ann_sample
+install(TARGETS ANN
+        EXPORT ANNTargets
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
+install(EXPORT ANNTargets
+        FILE ANNTargets.cmake
+        NAMESPACE ANN::
+        DESTINATION lib/cmake/ANN)
+
 install(DIRECTORY include/ANN DESTINATION include)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/ANN/Config.h DESTINATION include/ANN)
+

@@ -17,18 +17,14 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Added performance counting to annDist()
-//	Revision 1.1.2  01/27/10
-//		Fixed minor compilation bugs for new versions of gcc
 //----------------------------------------------------------------------
 
 #include <cstdlib>						// C standard lib defs
 #include <ANN/ANNx.h>					// all ANN includes
 #include <ANN/ANNperf.h>				// ANN performance 
+
+namespace ANN {
+
 
 using namespace std;					// make std:: accessible
 
@@ -45,8 +41,8 @@ using namespace std;					// make std:: accessible
 
 ANNdist annDist(						// interpoint squared distance
 	int					dim,
-	ANNpoint			p,
-	ANNpoint			q)
+	ANNpointConst p,
+	ANNpointConst q)
 {
 	int d;
 	ANNcoord diff;
@@ -68,7 +64,7 @@ ANNdist annDist(						// interpoint squared distance
 //----------------------------------------------------------------------
 
 void annPrintPt(						// print a point
-	ANNpoint			pt,				// the point
+	ANNpointConst pt,				// the point
 	int					dim,			// the dimension
 	std::ostream		&out)			// output stream
 {
@@ -117,7 +113,7 @@ ANNpoint annAllocPt(int dim, ANNcoord c)		// allocate 1 point
 ANNpointArray annAllocPts(int n, int dim)		// allocate n pts in dim
 {
 	ANNpointArray pa = new ANNpoint[n];			// allocate points
-	ANNpoint	  p  = new ANNcoord[n*dim];		// allocate space for coords
+	ANNpoint p  = new ANNcoord[n*dim];		// allocate space for coords
 	for (int i = 0; i < n; i++) {
 		pa[i] = &(p[i*dim]);
 	}
@@ -127,19 +123,19 @@ ANNpointArray annAllocPts(int n, int dim)		// allocate n pts in dim
 void annDeallocPt(ANNpoint &p)					// deallocate 1 point
 {
 	delete [] p;
-	p = NULL;
+	p = nullptr;
 }
    
 void annDeallocPts(ANNpointArray &pa)			// deallocate points
 {
-	if (pa != NULL) {
-		if (pa[0] != NULL) delete [] pa[0];		// dealloc coordinate storage
+	if (pa != nullptr) {
+		if (pa[0] != nullptr) delete [] pa[0];		// dealloc coordinate storage
 		delete [] pa;							// dealloc points
-		pa = NULL;
+		pa = nullptr;
 	}
 }
    
-ANNpoint annCopyPt(int dim, ANNpoint source)	// copy point
+ANNpoint annCopyPt(int dim, ANNpointConst source)	// copy point
 {
 	ANNpoint p = new ANNcoord[dim];
 	for (int i = 0; i < dim; i++) p[i] = source[i];
@@ -156,12 +152,12 @@ void annAssignRect(int dim, ANNorthRect &dest, const ANNorthRect &source)
 }
 
 												// is point inside rectangle?
-[[nodiscard]] ANNbool ANNorthRect::inside(int dim, ANNpoint p) const noexcept
+[[nodiscard]] bool ANNorthRect::inside(int dim, ANNpointConst p) const noexcept
 {
 	for (int i = 0; i < dim; i++) {
-		if (p[i] < lo[i] || p[i] > hi[i]) return ANNfalse;
+		if (p[i] < lo[i] || p[i] > hi[i]) return false;
 	}
-	return ANNtrue;
+	return true;
 }
 
 //----------------------------------------------------------------------
@@ -201,3 +197,5 @@ void annMaxPtsVisit(			// set limit on max. pts to visit in search
 {
 	ANNmaxPtsVisited = maxPts;
 }
+
+} // namespace ANN

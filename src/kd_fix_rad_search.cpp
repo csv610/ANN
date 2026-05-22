@@ -17,12 +17,12 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 1.1  05/03/05
-//		Initial release
 //----------------------------------------------------------------------
 
 #include "kd_fix_rad_search.h"			// kd fixed-radius search decls
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	Approximate fixed-radius k nearest neighbor search
@@ -43,7 +43,7 @@
 //----------------------------------------------------------------------
 
 int				ANNkdFRDim;				// dimension of space
-ANNpoint		ANNkdFRQ;				// query point
+ANNpointConst ANNkdFRQ;				// query point
 ANNdist			ANNkdFRSqRad;			// squared radius search bound
 double			ANNkdFRMaxErr;			// max tolerable squared error
 ANNpointArray	ANNkdFRPts;				// the points
@@ -56,7 +56,7 @@ int				ANNkdFRPtsInRange;		// number of points in the range
 //----------------------------------------------------------------------
 
 int ANNkd_tree::annkFRSearch(
-	ANNpoint			q,				// the query point
+	ANNpointConst			q,				// the query point
 	ANNdist				sqRad,			// squared radius search bound
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor indices (returned)
@@ -78,9 +78,9 @@ int ANNkd_tree::annkFRSearch(
 	root->ann_FR_search(annBoxDistance(q, bnd_box_lo, bnd_box_hi, dim));
 
 	for (int i = 0; i < k; i++) {		// extract the k-th closest points
-		if (dd != NULL)
+		if (dd != nullptr)
 			dd[i] = ANNkdFRPointMK->ith_smallest_key(i);
-		if (nn_idx != NULL)
+		if (nn_idx != nullptr)
 			nn_idx[i] = ANNkdFRPointMK->ith_smallest_info(i);
 	}
 
@@ -149,7 +149,7 @@ void ANNkd_leaf::ann_FR_search(ANNdist box_dist)
 {
 	ANNdist dist;				// distance to data point
 	ANNcoord* pp;				// data coordinate pointer
-	ANNcoord* qq;				// query coordinate pointer
+	ANNpointConst qq;				// query coordinate pointer
 	ANNcoord t;
 	int d;
 
@@ -181,3 +181,5 @@ void ANNkd_leaf::ann_FR_search(ANNdist box_dist)
 	ANN_PTS(n_pts)						// increment points visited
 	ANNkdFRPtsVisited += n_pts;			// increment number of points visited
 }
+
+} // namespace ANN

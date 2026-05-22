@@ -17,9 +17,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef ANN_kd_search_H
@@ -31,6 +28,9 @@
 
 #include <ANN/ANNperf.h>				// performance evaluation
 
+namespace ANN {
+
+
 //----------------------------------------------------------------------
 //	More global variables
 //		These are active for the life of each call to annkSearch(). They
@@ -39,10 +39,13 @@
 //----------------------------------------------------------------------
 
 extern thread_local int				ANNkdDim;		// dimension of space (static copy)
-extern thread_local ANNpoint			ANNkdQ;			// query point (static copy)
+extern thread_local ANNpointConst ANNkdQ;			// query point (static copy)
 extern thread_local double			ANNkdMaxErr;	// max tolerable squared error
 extern thread_local ANNpointArray	ANNkdPts;		// the points (static copy)
 extern thread_local ANNmin_k			*ANNkdPointMK;	// set of k closest points
 extern thread_local int				ANNptsVisited;	// number of points visited
+
+
+} // namespace ANN
 
 #endif

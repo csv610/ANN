@@ -17,15 +17,15 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
 //----------------------------------------------------------------------
 
 #ifndef ANN_kd_util_H
 #define ANN_kd_util_H
 
 #include "kd_tree.h"					// kd-tree declarations
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 //	externally accessible functions
@@ -50,9 +50,9 @@ void annEnclCube(				// compute smallest enclosing cube
 	ANNorthRect &bnds);					// bounding cube (returned)
 
 ANNdist annBoxDistance(			// compute distance from point to box
-	const ANNpoint		q,				// the point
-	const ANNpoint		lo,				// low point of box
-	const ANNpoint		hi,				// high point of box
+	ANNpointConst q,				// the point
+	ANNpointConst		lo,				// low point of box
+	ANNpointConst		hi,				// high point of box
 	int					dim);			// dimension of space
 
 ANNcoord annSpread(				// compute point spread along dimension
@@ -120,5 +120,8 @@ void annBnds2Box(				// convert bounds to inner box
 	int					n_bnds,			// number of bounds
 	ANNorthHSArray		bnds,			// bounds array
 	ANNorthRect			&inner_box);	// inner box (returned)
+
+
+} // namespace ANN
 
 #endif

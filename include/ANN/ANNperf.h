@@ -20,11 +20,6 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-//      History:
-//      Revision 0.1  03/04/98
-//          Initial release
-//      Revision 1.0  04/01/05
-//          Added ANN_ prefix to avoid name conflicts.
 //----------------------------------------------------------------------
 
 #ifndef ANNperf_H
@@ -35,6 +30,9 @@
 //----------------------------------------------------------------------
 
 #include <ANN/ANN.h>					// basic ANN includes
+
+namespace ANN {
+
 
 //----------------------------------------------------------------------
 // kd-tree stats object
@@ -218,6 +216,9 @@ DLL_API void annResetCounts();				// reset counts for one queries
 
 DLL_API void annUpdateStats();				// update stats with current counts
 
-DLL_API void annPrintStats(ANNbool validate); // print statistics for a run
+DLL_API void annPrintStats(bool validate); // print statistics for a run
+
+
+} // namespace ANN
 
 #endif

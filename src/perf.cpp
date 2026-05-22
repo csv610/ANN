@@ -17,19 +17,13 @@
 // any purpose.  It is provided "as is" without express or implied
 // warranty.
 //----------------------------------------------------------------------
-// History:
-//	Revision 0.1  03/04/98
-//		Initial release
-//	Revision 1.0  04/01/05
-//		Changed names to avoid namespace conflicts.
-//		Added flush after printing performance stats to fix bug
-//			in Microsoft Windows version.
-//	Revision 1.1.2  01/27/10
-//		Fixed minor compilation bugs for new versions of gcc
 //----------------------------------------------------------------------
 
 #include <ANN/ANN.h>					// basic ANN includes
 #include <ANN/ANNperf.h>				// performance includes
+
+namespace ANN {
+
 
 using namespace std;					// make std:: available
 
@@ -114,7 +108,7 @@ void print_one_stat(const char* title, ANNsampStat s, double div)
 }
 
 DLL_API void annPrintStats(				// print statistics for a run
-	ANNbool validate)					// true if average errors desired
+	bool validate)					// true if average errors desired
 {
 	cout.precision(4);					// set floating precision
 	cout << "  (Performance stats: "
@@ -134,3 +128,5 @@ DLL_API void annPrintStats(				// print statistics for a run
 	cout << "  )\n";
 	cout.flush();
 }
+
+} // namespace ANN

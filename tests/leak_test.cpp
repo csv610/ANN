@@ -4,6 +4,8 @@
 #include <random>
 #include <ANN/NearestNeighborSearch.h>
 
+using namespace ANN;
+
 void run_iteration(int n_pts) {
     constexpr int dim = 3;
     std::vector<std::array<double, dim>> points(n_pts);
