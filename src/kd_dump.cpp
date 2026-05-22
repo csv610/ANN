@@ -57,11 +57,13 @@ static ANNkd_ptr annReadDump(			// read dump file
 	ANNpoint			&the_bnd_box_lo,		// low bounding point
 	ANNpoint			&the_bnd_box_hi);		// high bounding point
 
-static ANNkd_ptr annReadTree(			// read tree-part of dump file
-	istream				&in,					// input stream
-	ANNtreeType			tree_type,				// type of tree expected
-	ANNidxArray			the_pidx,				// point indices (modified)
-	int					&next_idx);				// next index (modified)
+static ANNkd_ptr annReadTree(
+	istream				&in,
+	ANNtreeType			tree_type,
+	ANNidxArray			the_pidx,
+	int					&next_idx,
+	int                 max_n_pts,
+	int                 dim);
 
 //----------------------------------------------------------------------
 //	ANN kd- and bd-tree Dump Format
@@ -266,34 +268,50 @@ static ANNkd_ptr annReadDump(
 	//------------------------------------------------------------------
 	//	Input file header
 	//------------------------------------------------------------------
-	in >> str;									// input header
-	if (strcmp(str, "#ANN") != 0) {				// incorrect header
+	if (!(in >> str) || strcmp(str, "#ANN") != 0) {				// incorrect header
 		annError("Incorrect header for dump file", ANNabort);
 	}
 	in.getline(version, STRING_LEN);			// get version (ignore)
 
 	//------------------------------------------------------------------
 	//	Input the points
-	//			An array the_pts is allocated and points are read from
-	//			the dump file.
 	//------------------------------------------------------------------
-	in >> str;									// get major heading
+	if (!(in >> str)) annError("Unexpected end of dump file", ANNabort);
+
 	if (strcmp(str, "points") == 0) {			// points section
-		in >> the_dim;							// input dimension
-		in >> the_n_pts;						// number of points
+		if (!(in >> the_dim >> the_n_pts)) {
+			annError("Error reading points header", ANNabort);
+		}
+		
+		if (the_dim <= 0 || the_dim > 10000) {
+			annError("Invalid dimension in dump file", ANNabort);
+		}
+		if (the_n_pts < 0 || the_n_pts > 100000000) {
+			annError("Invalid number of points in dump file", ANNabort);
+		}
+		
+		// Check for integer overflow before allocation
+		if (the_n_pts > 0 && the_dim > 0) {
+			if (static_cast<long long>(the_n_pts) * the_dim > 2147483647LL) {
+				annError("Point set too large for memory allocation", ANNabort);
+			}
+		}
+
 												// allocate point storage
 		the_pts = annAllocPts(the_n_pts, the_dim);
 		for (int i = 0; i < the_n_pts; i++) {	// input point coordinates
 			ANNidx idx;							// point index
-			in >> idx;							// input point index
+			if (!(in >> idx)) annError("Error reading point index", ANNabort);
 			if (idx < 0 || idx >= the_n_pts) {
 				annError("Point index is out of range", ANNabort);
 			}
 			for (j = 0; j < the_dim; j++) {
-				in >> the_pts[idx][j];			// read point coordinates
+				if (!(in >> the_pts[idx][j])) {
+					annError("Error reading point coordinates", ANNabort);
+				}
 			}
 		}
-		in >> str;								// get next major heading
+		if (!(in >> str)) annError("Unexpected end of dump file", ANNabort);
 	}
 	else {										// no points were input
 		annError("Points must be supplied in the dump file", ANNabort);
@@ -301,72 +319,56 @@ static ANNkd_ptr annReadDump(
 
 	//------------------------------------------------------------------
 	//	Input the tree
-	//			After the basic header information, we invoke annReadTree
-	//			to do all the heavy work.  We create our own array of
-	//			point indices (so we can pass them to annReadTree())
-	//			but we do not deallocate them.	They will be deallocated
-	//			when the tree is destroyed.
 	//------------------------------------------------------------------
 	if (strcmp(str, "tree") == 0) {				// tree section
-		in >> the_dim;							// read dimension
-		in >> the_n_pts;						// number of points
-		in >> the_bkt_size;						// bucket size
+		int tree_dim, tree_n_pts;
+		if (!(in >> tree_dim >> tree_n_pts >> the_bkt_size)) {
+			annError("Error reading tree header", ANNabort);
+		}
+
+		if (tree_dim != the_dim || tree_n_pts != the_n_pts) {
+			annError("Tree header does not match points header", ANNabort);
+		}
+		
+		if (the_bkt_size <= 0) {
+			annError("Invalid bucket size in dump file", ANNabort);
+		}
+
 		the_bnd_box_lo = annAllocPt(the_dim);	// allocate bounding box pts
 		the_bnd_box_hi = annAllocPt(the_dim);
 
 		for (j = 0; j < the_dim; j++) {			// read bounding box low
-			in >> the_bnd_box_lo[j];
+			if (!(in >> the_bnd_box_lo[j])) annError("Error reading bounding box", ANNabort);
 		}
-		for (j = 0; j < the_dim; j++) {			// read bounding box low
-			in >> the_bnd_box_hi[j];
+		for (j = 0; j < the_dim; j++) {			// read bounding box high
+			if (!(in >> the_bnd_box_hi[j])) annError("Error reading bounding box", ANNabort);
 		}
+		
 		the_pidx = new ANNidx[the_n_pts];		// allocate point index array
 		int next_idx = 0;						// number of indices filled
 												// read the tree and indices
-		the_root = annReadTree(in, tree_type, the_pidx, next_idx);
+		the_root = annReadTree(in, tree_type, the_pidx, next_idx, the_n_pts, the_dim);
 		if (next_idx != the_n_pts) {			// didn't see all the points?
 			annError("Didn't see as many points as expected", ANNwarn);
 		}
 	}
 	else {
-		annError("Illegal dump format.	Expecting section heading", ANNabort);
+		annError("Illegal dump format. Expecting section heading", ANNabort);
 	}
 	return the_root;
 }
 
 //----------------------------------------------------------------------
 // annReadTree - input tree and return pointer
-//
-//		annReadTree reads in a node of the tree, makes any recursive
-//		calls as needed to input the children of this node (if internal).
-//		It returns a pointer to the node that was created.	An array
-//		of point indices is given along with a pointer to the next
-//		available location in the array.  As leaves are read, their
-//		point indices are stored here, and the point buckets point
-//		to the first entry in the array.
-//
-//		Recall that these are the formats.	The tree is given in
-//		preorder.
-//
-//		Leaf node:
-//				leaf <n_pts> <bkt[0]> <bkt[1]> ... <bkt[n-1]>
-//		Splitting nodes:
-//				split <cut_dim> <cut_val> <lo_bound> <hi_bound>
-//
-//		For bd-trees:
-//
-//		Shrinking nodes:
-//				shrink <n_bnds>
-//						<cut_dim> <cut_val> <side>
-//						<cut_dim> <cut_val> <side>
-//						... (repeated n_bnds times)
 //----------------------------------------------------------------------
 
 static ANNkd_ptr annReadTree(
 	istream				&in,					// input stream
 	ANNtreeType			tree_type,				// type of tree expected
 	ANNidxArray			the_pidx,				// point indices (modified)
-	int					&next_idx)				// next index (modified)
+	int					&next_idx,				// next index (modified)
+	int                 max_n_pts,              // max points allowed
+	int                 dim)                    // dimension
 {
 	char tag[STRING_LEN];						// tag (leaf, split, shrink)
 	int n_pts;									// number of points in leaf
@@ -377,7 +379,7 @@ static ANNkd_ptr annReadTree(
 	int n_bnds;									// number of bounding sides
 	int sd;										// which side
 
-	in >> tag;									// input node tag
+	if (!(in >> tag)) annError("Unexpected end of tree data", ANNabort);
 
 	if (strcmp(tag, "null") == 0) {				// null tree
 		return nullptr;
@@ -387,14 +389,22 @@ static ANNkd_ptr annReadTree(
 	//------------------------------------------------------------------
 	if (strcmp(tag, "leaf") == 0) {				// leaf node
 
-		in >> n_pts;							// input number of points
+		if (!(in >> n_pts)) annError("Error reading leaf node", ANNabort);
+		if (n_pts < 0 || next_idx + n_pts > max_n_pts) {
+			annError("Invalid number of points in leaf node", ANNabort);
+		}
+
 		int old_idx = next_idx;					// save next_idx
 		if (n_pts == 0) {						// trivial leaf
 			return KD_TRIVIAL;
 		}
 		else {
 			for (int i = 0; i < n_pts; i++) {	// input point indices
-				in >> the_pidx[next_idx++];		// store in array of indices
+				if (!(in >> the_pidx[next_idx])) annError("Error reading point index in leaf", ANNabort);
+				if (the_pidx[next_idx] < 0 || the_pidx[next_idx] >= max_n_pts) {
+					annError("Point index in leaf out of range", ANNabort);
+				}
+				next_idx++;
 			}
 		}
 		return new ANNkd_leaf(n_pts, &the_pidx[old_idx]);
@@ -404,11 +414,14 @@ static ANNkd_ptr annReadTree(
 	//------------------------------------------------------------------
 	else if (strcmp(tag, "split") == 0) {		// splitting node
 
-		in >> cd >> cv >> lb >> hb;
+		if (!(in >> cd >> cv >> lb >> hb)) annError("Error reading splitting node", ANNabort);
+		if (cd < 0 || cd >= dim) {
+			annError("Invalid cutting dimension in splitting node", ANNabort);
+		}
 
 												// read low and high subtrees
-		ANNkd_ptr lc = annReadTree(in, tree_type, the_pidx, next_idx);
-		ANNkd_ptr hc = annReadTree(in, tree_type, the_pidx, next_idx);
+		ANNkd_ptr lc = annReadTree(in, tree_type, the_pidx, next_idx, max_n_pts, dim);
+		ANNkd_ptr hc = annReadTree(in, tree_type, the_pidx, next_idx, max_n_pts, dim);
 												// create new node and return
 		return new ANNkd_split(cd, cv, lb, hb, lc, hc);
 	}
@@ -420,23 +433,33 @@ static ANNkd_ptr annReadTree(
 			annError("Shrinking node not allowed in kd-tree", ANNabort);
 		}
 
-		in >> n_bnds;							// number of bounding sides
+		if (!(in >> n_bnds)) annError("Error reading shrinking node", ANNabort);
+		if (n_bnds < 0 || n_bnds > 1000) { // Reasonable limit for bounding sides
+			annError("Invalid number of bounding sides in shrinking node", ANNabort);
+		}
+
 												// allocate bounds array
 		ANNorthHSArray bds = new ANNorthHalfSpace[n_bnds];
 		for (int i = 0; i < n_bnds; i++) {
-			in >> cd >> cv >> sd;				// input bounding halfspace
+			if (!(in >> cd >> cv >> sd)) annError("Error reading shrinking node bounds", ANNabort);
+			if (cd < 0 || cd >= dim) {
+				annError("Invalid dimension in shrinking node", ANNabort);
+			}
+			if (sd != ANN_LO && sd != ANN_HI) {
+				annError("Invalid side in shrinking node", ANNabort);
+			}
 												// copy to array
 			bds[i] = ANNorthHalfSpace(cd, cv, sd);
 		}
 												// read inner and outer subtrees
-		ANNkd_ptr ic = annReadTree(in, tree_type, the_pidx, next_idx);
-		ANNkd_ptr oc = annReadTree(in, tree_type, the_pidx, next_idx);
+		ANNkd_ptr ic = annReadTree(in, tree_type, the_pidx, next_idx, max_n_pts, dim);
+		ANNkd_ptr oc = annReadTree(in, tree_type, the_pidx, next_idx, max_n_pts, dim);
 												// create new node and return
 		return new ANNbd_shrink(n_bnds, bds, ic, oc);
 	}
 	else {
 		annError("Illegal node type in dump file", ANNabort);
-		exit(0);								// to keep the compiler happy
+		return nullptr; // Should not reach here
 	}
 }
 
